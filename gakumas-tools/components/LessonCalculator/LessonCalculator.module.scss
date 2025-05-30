@@ -1,0 +1,72 @@
+@use "sass:color";
+@use "../../styles/colors";
+
+.lessonCalculator {
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.results {
+  table-layout: fixed;
+  width: 100%;
+  text-align: center;
+
+  th,
+  td {
+    padding: 8px 0;
+  }
+
+  th {
+    background-color: colors.$gray;
+    color: colors.$white;
+  }
+
+  th:nth-last-child(3) {
+    background-color: colors.$vocal;
+  }
+
+  th:nth-last-child(2) {
+    background-color: colors.$dance;
+  }
+
+  th:nth-last-child(1) {
+    background-color: colors.$visual;
+  }
+
+  td {
+    color: colors.$black-dark;
+  }
+
+  td:nth-last-child(3n + 1) {
+    background-color: color.scale(colors.$visual, $alpha: -50%);
+  }
+
+  td:nth-last-child(3n + 2) {
+    background-color: color.scale(colors.$dance, $alpha: -50%);
+  }
+
+  td:nth-last-child(3n + 3) {
+    background-color: color.scale(colors.$vocal, $alpha: -50%);
+  }
+
+  td:nth-child(-n + 2),
+  .perfect {
+    background-color: colors.$gray-extra-light !important;
+  }
+}
+
+@container (width < 530px) {
+  .results {
+    font-size: 12px;
+
+    th,
+    td {
+      padding: 4px 0;
+      overflow: hidden;
+    }
+  }
+}

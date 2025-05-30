@@ -1,0 +1,19 @@
+@use "../../styles/colors";
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  input {
+    width: 1.5em;
+    height: 1.5em;
+    accent-color: colors.$gk-orange;
+    cursor: pointer;
+  }
+
+  label {
+    display: inline;
+    user-select: none;
+  }
+}

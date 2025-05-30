@@ -1,0 +1,26 @@
+@use "../../styles/colors";
+
+.loader {
+  width: calc(1em + 8px);
+  aspect-ratio: 1;
+  display: grid;
+  border: 2px solid #0000;
+  border-radius: 50%;
+  border-right-color: colors.$blue;
+  animation: spin 1s infinite linear;
+}
+
+.loader::before {
+  content: "";
+  grid-area: 1/1;
+  margin: 3px;
+  border: inherit;
+  border-radius: 50%;
+  animation: spin 2s infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(1turn);
+  }
+}

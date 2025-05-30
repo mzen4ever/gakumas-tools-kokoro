@@ -1,0 +1,18 @@
+@use "../../styles/mixins";
+@use "../../styles/colors";
+
+.params {
+  display: flex;
+  flex-direction: row;
+
+  .param {
+    flex: 1;
+    padding: 4px;
+    font-weight: 600;
+    text-align: center;
+
+    @include mixins.param-colors using ($param-color) {
+      color: $param-color;
+    }
+  }
+}

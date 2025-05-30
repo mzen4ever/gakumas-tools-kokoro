@@ -1,0 +1,16 @@
+@use "../../components/ButtonGroup/ButtonGroup.module";
+
+.fieldButtons {
+  @extend .buttonGroup;
+
+  flex-wrap: wrap;
+  margin-top: 8px;
+
+  button {
+    padding: 6px;
+
+    @media only screen and (max-width: 600px) {
+      font-size: 12px;
+    }
+  }
+}

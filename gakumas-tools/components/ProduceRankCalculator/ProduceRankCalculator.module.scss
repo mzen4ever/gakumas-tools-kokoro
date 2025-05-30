@@ -1,0 +1,16 @@
+.produceRankCalculator {
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.bonus {
+  font-size: 0.8em;
+}
+
+.rankSelect {
+  align-self: flex-start;
+}

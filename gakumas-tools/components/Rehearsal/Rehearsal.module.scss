@@ -1,0 +1,58 @@
+@use "sass:color";
+@use "../../styles/colors";
+
+.rehearsal {
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.help {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.files {
+  width: 100%;
+  margin-top: 16px;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: colors.$gk-orange-extra-light;
+}
+
+.progress {
+  margin-top: 4px;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: colors.$gk-orange;
+}
+
+.tableWrapper {
+  overflow: auto;
+
+  table {
+    width: 100%;
+  }
+
+  thead {
+    background-color: color.adjust(colors.$gk-orange, $lightness: 20%);
+  }
+
+  tbody {
+    background-color: color.adjust(colors.$gk-orange, $lightness: 40%);
+  }
+
+  th,
+  td {
+    padding: 8px;
+  }
+}
+
+.ad {
+  margin-top: 24px;
+}

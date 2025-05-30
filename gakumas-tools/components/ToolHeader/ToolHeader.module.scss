@@ -1,0 +1,16 @@
+@use "../../styles/colors";
+
+.toolHeader {
+  position: absolute;
+  margin: 12px;
+  color: colors.$black;
+  transition: color 0.2s;
+
+  &:hover {
+    color: colors.$gk-orange;
+  }
+
+  @media only screen and (max-width: 600px) {
+    display: none;
+  }
+}

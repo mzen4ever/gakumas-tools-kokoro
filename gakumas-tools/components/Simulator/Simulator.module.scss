@@ -1,0 +1,116 @@
+@use "../../styles/colors";
+
+.loadoutEditor {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.configurator {
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 16px 0;
+  overflow: auto;
+}
+
+.note a {
+  color: colors.$blue-dark;
+  text-decoration: underline;
+}
+
+.supportBonusInput {
+  display: flex;
+
+  input {
+    width: 80px;
+  }
+}
+
+.typeMultipliers {
+  display: flex;
+  font-size: 14px;
+
+  & > div {
+    flex: 1;
+    text-align: center;
+  }
+
+  div:nth-child(1) {
+    color: #f23584;
+  }
+  div:nth-child(2) {
+    color: #1c85ed;
+  }
+  div:nth-child(3) {
+    color: #f7b12e;
+  }
+}
+
+.pItemsRow {
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+  color: colors.$black;
+}
+
+.pItems {
+  flex: 1;
+}
+
+.expanderButtons {
+  display: flex;
+  margin-bottom: 4px;
+
+  button {
+    margin: 0 auto;
+    color: colors.$blue;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .disabled {
+    color: colors.$gray;
+    cursor: default;
+  }
+}
+
+.strategySelect {
+  border: 2px solid colors.$gray-light;
+  border-radius: 4px;
+  padding: 4px;
+  display: none;
+}
+
+.subLinks {
+  display: flex;
+  justify-content: space-between;
+  color: colors.$blue;
+  font-size: 12px;
+}
+
+.url {
+  font-size: 10px;
+  word-break: break-all;
+}
+
+.buttons {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+
+  button,
+  a {
+    min-width: 60px;
+    padding: 8px;
+  }
+}
+
+.loader {
+  flex: 0;
+}
+
+.ad {
+  margin-bottom: 16px;
+}

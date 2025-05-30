@@ -1,0 +1,19 @@
+@use "../../styles/colors";
+
+.table {
+  color: colors.$black-dark;
+  text-align: center;
+
+  thead {
+    background-color: colors.$gk-orange-light;
+  }
+
+  tbody {
+    background-color: colors.$gk-orange-extra-light;
+  }
+
+  th,
+  td {
+    padding: 4px 8px;
+  }
+}

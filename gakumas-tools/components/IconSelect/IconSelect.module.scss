@@ -1,0 +1,36 @@
+@use "../../styles/colors";
+
+.iconSelect {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  border: 2px solid colors.$gray-light;
+  border-radius: 22px;
+  padding: 4px;
+}
+
+.option {
+  border-radius: 16px;
+  padding: 4px;
+  transition: all 0.2s;
+
+  @container (width < 512px) {
+    display: none;
+  }
+
+  &.expanded {
+    display: flex;
+  }
+}
+
+.current {
+  display: none;
+
+  @container (width < 512px) {
+    display: flex;
+  }
+}
+
+.selected {
+  box-shadow: 0 0 4px colors.$gray-dark;
+}

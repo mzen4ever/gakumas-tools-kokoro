@@ -1,0 +1,89 @@
+@use "../../styles/mixins";
+@use "../../styles/colors";
+
+.entityDetails {
+  display: flex;
+  flex-direction: column;
+  height: 200px;
+
+  @container (width < 460px) {
+    height: 160px;
+  }
+}
+
+.imageWrapper {
+  position: relative;
+  flex: 1;
+
+  img {
+    object-fit: contain;
+  }
+}
+
+.placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: colors.$gray-light;
+  font-size: 60px;
+}
+
+.c11ns {
+  height: 12px;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin: 0 8px;
+
+  transition: height 0.2s;
+}
+
+.c11n {
+  flex: 1;
+  min-width: 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px colors.$gray-light;
+  overflow: hidden;
+
+  @include mixins.c11n-gradients using ($c11n-gradient) {
+    background: $c11n-gradient;
+  }
+}
+
+.max {
+  width: 50%;
+  margin: auto;
+  border-radius: 0 0 6px 6px;
+  background-color: colors.$white;
+  font-size: 12px;
+}
+
+.name {
+  padding: 2px 8px;
+  color: colors.$white;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.max,
+.name {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.expanded {
+  height: 48px;
+
+  .c11n {
+    border: 2px solid colors.$white;
+  }
+
+  .max,
+  .name {
+    opacity: 1;
+  }
+}

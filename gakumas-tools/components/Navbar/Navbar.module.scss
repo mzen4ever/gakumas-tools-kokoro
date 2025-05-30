@@ -1,0 +1,42 @@
+@use "sass:color";
+@use "../../styles/colors";
+
+.navbar {
+  z-index: 10;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 0 8px color.adjust(colors.$black, $alpha: -0.75);
+  background-color: colors.$white;
+  color: colors.$black-light;
+
+  h1 {
+    margin: 0 8px;
+
+    @media only screen and (max-width: 600px) {
+      display: none;
+    }
+  }
+}
+
+.links {
+  flex: 1;
+  height: 100%;
+  display: flex;
+}
+
+.link {
+  min-width: 44px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: color 0.2s;
+
+  &:hover {
+    color: colors.$gk-red-orange;
+  }
+}
+
+.active {
+  color: colors.$gk-orange;
+}

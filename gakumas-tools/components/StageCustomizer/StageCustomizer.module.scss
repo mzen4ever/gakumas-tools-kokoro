@@ -1,0 +1,33 @@
+@use "../../styles/colors";
+
+.stageCustomizer {
+  max-height: 800px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+
+.effects {
+  display: flex;
+  flex-direction: column;
+
+  textarea {
+    min-height: 80px;
+    resize: vertical;
+    font-size: 16px;
+    border: 2px solid colors.$gk-orange;
+    border-radius: 4px;
+    padding: 8px;
+  }
+
+  a {
+    color: colors.$blue;
+    font-size: 14px;
+  }
+}
+
+.apply {
+  margin-top: 16px;
+}

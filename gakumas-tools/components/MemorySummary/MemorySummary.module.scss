@@ -1,0 +1,84 @@
+@use "../../styles/mixins";
+@use "sass:color";
+@use "../../styles/colors";
+
+.memorySummary {
+  min-width: 0;
+  max-width: 100vw;
+  flex: 1;
+  display: flex;
+  transition: 0.2s all;
+
+  &:hover,
+  &:focus-within {
+    background-color: color.adjust(colors.$gk-orange, $lightness: 30%);
+
+    .left .actions {
+      opacity: 1;
+    }
+  }
+}
+
+.left {
+  position: relative;
+}
+
+.actions {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: 0.2s all;
+
+  button {
+    transform: scale(0.6);
+    margin: -8px;
+  }
+}
+
+.details {
+  flex: 1;
+  min-width: 0;
+  padding: 4px;
+}
+
+.text {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 16px;
+}
+
+.row {
+  display: flex;
+  gap: 2px;
+}
+
+.imgWrapper {
+  width: 16%;
+  max-width: 50px;
+}
+
+.filler {
+  flex: 1;
+}
+
+.parameters {
+  width: 120px;
+  display: flex;
+  gap: 1px;
+  margin: 8px 0;
+  border-radius: 4px;
+  overflow: hidden;
+
+  & > div {
+    @include mixins.param-colors using ($param-color) {
+      background-color: $param-color;
+    }
+  }
+}

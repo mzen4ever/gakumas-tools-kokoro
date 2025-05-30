@@ -1,0 +1,325 @@
+{
+  "metadata": {
+    "title": "Gakumas Tools",
+    "description": "Gakumas Tools is a collection of useful tools for producers at Hatsuboshi Gakuen. Calculate required final exam scores for produce ranks, view p-item and skill card information, organize memories, plan and simulate contest loadouts and more. Be the best producer and help your idols shine!"
+  },
+  "tools": {
+    "home": {
+      "title": "Home",
+      "description": "Overview of available tools"
+    },
+    "produceRankCalculator": {
+      "title": "Produce Rank Calculator",
+      "description": "Calculate final exam score required to achieve each produce rank"
+    },
+    "niaCalculator": {
+      "title": "N.I.A Calculator",
+      "description": "Calculate audition bonus and produce rank for N.I.A"
+    },
+    "lessonCalculator": {
+      "title": "Lesson Calculator",
+      "description": "Calculate parameters gained from lessons"
+    },
+    "dex": {
+      "title": "P-Index",
+      "description": "Filter and view p-item and skill card information"
+    },
+    "memoryCalculator": {
+      "title": "Memory Calculator",
+      "description": "Calculate probability of getting desired skill card combinations in memories"
+    },
+    "memories": {
+      "title": "Memories",
+      "description": "Create or import memories, and search by p-items and skill cards"
+    },
+    "simulator": {
+      "title": "Contest Simulator",
+      "description": "Create and simulate contest loadouts, and calculate memory cost"
+    },
+    "rehearsal": {
+      "title": "Rehearsal Parser",
+      "description": "Parse scores from rehearsal screenshots"
+    }
+  },
+  "NavbarMenu": {
+    "menu": "Menu",
+    "signInWithDiscord": "Sign in with Discord",
+    "home": "Home",
+    "gakumasContestWiki": "Gakumas Contest Wiki",
+    "sendFeedback": "Send feedback",
+    "signOut": "Sign out"
+  },
+  "Welcome": {
+    "title": "Gakumas Tools",
+    "introduction": "Tools for playing Gakuen Idolmaster. Calculate required final exam scores for produce ranks, view p-item and skill card information, import and search memories, simulate contest loadouts and more!"
+  },
+  "Calculator": {
+    "scenario": "Scenario",
+    "hajime": "Hajime",
+    "nia": "N.I.A"
+  },
+  "ProduceRankCalculator": {
+    "scenarios": {
+      "hajime": "Hajime",
+      "nia": "N.I.A"
+    },
+    "difficulties": {
+      "regular": "Regular",
+      "pro": "Pro",
+      "master": "Master"
+    },
+    "places": {
+      "1": "1st",
+      "2": "2nd",
+      "3": "3rd",
+      "4": "Other"
+    },
+    "scenario": "Scenario",
+    "difficulty": "Difficulty",
+    "parameterLimit": "Parameter limit",
+    "finalExamPlacement": "Final exam placement",
+    "parameter": "Parameter",
+    "parameters": "Parameters",
+    "targetScores": "Target scores",
+    "produceRank": "Produce rank",
+    "targetScore": "Target score",
+    "score": "Score",
+    "niaNote": "※Calculation will be updated as we learn more about parameter and vote counts from audition bonus.",
+    "affectionAtStartOfProduce": "Affection at start of produce",
+    "stage": "Stage",
+    "runN": "Run {num}",
+    "runN+": "Run {num}+",
+    "idol": "Idol",
+    "evaluationCriteria": "Evaluation criteria",
+    "paramsPreAudition": "Params (pre-audition)",
+    "challengePItemsParamBonusPct": "Challenge p-items param bonus %",
+    "paramBonusPct": "Param bonus %",
+    "votesPreAudition": "Votes (pre-audition)",
+    "recommendedScores": "Recommended scores",
+    "paramHighGrowthScores": "Param growth slows above these scores",
+    "paramMaximizingScores": "Param growth stops above these scores",
+    "voteCount": "Vote count",
+    "scores": "Scores",
+    "gainedParams": "Gained params",
+    "challengeParams": "Challenge p-items params",
+    "bonusParams": "Bonus params",
+    "paramsPostAudition": "Params (post-audition)",
+    "gainedVotes": "Gained votes",
+    "votesPostAudition": "Votes (post-audition)"
+  },
+  "LessonCalculator": {
+    "difficulties": {
+      "regular": "Regular",
+      "pro": "Pro",
+      "master": "Master"
+    },
+    "difficulty": "Difficulty",
+    "lessonBonus": "Lesson bonus %",
+    "limitIncrease": "Limit increase",
+    "lessons": "Lessons",
+    "week": "Week",
+    "type": "Type",
+    "normal": "N",
+    "sp": "SP",
+    "oikomi": "Oikomi",
+    "score": "Score"
+  },
+  "Dex": {
+    "skillCards": "Skill cards",
+    "pItems": "P-items",
+    "maxTimes": "Max {n}"
+  },
+  "EntityBank": {
+    "filter": "Filter"
+  },
+  "EntityIcon": {
+    "high": "H",
+    "low": "L",
+    "planMismatch": "Plan mismatch",
+    "pIdolMismatch": "P-idol mismatch",
+    "idolMismatch": "Idol mismatch"
+  },
+  "EntityCustomizer": {
+    "customization": "Customization"
+  },
+  "CustomizationModal": {
+    "apply": "Apply"
+  },
+  "MemoryCalculator": {
+    "note": "Note: Probabilities shown are estimated based on a uniform distribution. The real skill card selection algorithm is not known.",
+    "target": "Target skill cards",
+    "acquired": "Acquired skill cards (include pre/post-upgrade)",
+    "produceRank": "Produce rank",
+    "costRange": "Cost range",
+    "success": "Success",
+    "failure": "Failure"
+  },
+  "TargetSkillCards": {
+    "acquired": "Acquired"
+  },
+  "MemorySummaryActionButtons": {
+    "edit": "Edit"
+  },
+  "MemoryEditorModal": {
+    "name": "Name",
+    "contestPower": "Contest power",
+    "cost": "Cost"
+  },
+  "ParametersInput": {
+    "stamina": "Stamina"
+  },
+  "MemorySave": {
+    "save": "Save",
+    "saveAsNew": "Save as new",
+    "signInToSave": "Sign in with Discord to save"
+  },
+  "MemoriesNudge": {
+    "create": "Create a memory",
+    "import": "Import memories from screenshots"
+  },
+  "MemoriesHeader": {
+    "selected": "{num} memories selected",
+    "delete": "Delete"
+  },
+  "MemoryImporterModal": {
+    "importMemories": "Import memories from screenshots",
+    "instructions": "<p>Contest power, parameters, p-items, and skill card icons must be visible in each screenshot.</p><p>Importing may take several seconds or minutes depending on the number of memories imported and your device's processor and memory. Your browser may crash if you try to import too many memories at once. The recommended limit is 50 memories per batch. Use on a smartphone is not recommended.</p><p>Some memories may fail to parse correctly, and require fixing after import. In such cases, they will be marked with \"(FIXME)\" in the name.</p>",
+    "progress": "Progress: {progress}/{total}"
+  },
+  "Simulator": {
+    "supportBonus": "Support bonus %",
+    "enterPercents": "Since the score multiplier calculation is unknown, please enter the multipliers (%) directly.",
+    "custom": "Custom",
+    "simulate": "Simulate",
+    "provideData": "Provide data",
+    "lastUpdated": "Last updated"
+  },
+  "StageSelect": {
+    "placeholder": "Select stage"
+  },
+  "StageSelectModal": {
+    "contest": "Contest",
+    "event": "Event",
+    "custom": "Custom"
+  },
+  "StageSummary": {
+    "contestStageName": "Season {season} - Stage {stage}",
+    "eventStageName": "{name} - Stage {stage} - Round {round}",
+    "custom": "Custom"
+  },
+  "StageCustomizer": {
+    "turnCounts": "Turn counts",
+    "firstTurn": "First turn rate",
+    "criteria": "Criteria",
+    "effects": "Effects",
+    "effectFormat": "Effect format",
+    "defaultCards": "Default cards",
+    "contest": "Contest",
+    "event": "Event",
+    "apply": "Apply"
+  },
+  "LoadoutSkillCardGroup": {
+    "cost": "Cost"
+  },
+  "SimulatorSubTools": {
+    "costRanges": "Cost ranges",
+    "history": "History β",
+    "defaultCards": "Default cards"
+  },
+  "CostRanges": {
+    "rank": "Rank",
+    "min": "Min",
+    "max": "Max"
+  },
+  "SimulatorButtons": {
+    "confirm": "Are you sure you want to clear the loadout?",
+    "clear": "Clear",
+    "manageLoadouts": "Save/Load β"
+  },
+  "ConfirmModal": {
+    "cancel": "Cancel",
+    "ok": "OK"
+  },
+  "SimulatorResult": {
+    "min": "Min",
+    "average": "Average",
+    "median": "Median",
+    "max": "Max",
+    "logs": "Logs"
+  },
+  "SimulatorResultGraphs": {
+    "score": "Score"
+  },
+  "stage": {
+    "turnsRemaining": "Turns remaining",
+    "cardUsesRemaining": "Card uses remaining",
+    "stamina": "Stamina",
+    "genki": "Genki",
+    "score": "Score",
+    "goodConditionTurns": "Good condition",
+    "perfectConditionTurns": "Perfect condition",
+    "concentration": "Concentration",
+    "goodImpressionTurns": "Good impression",
+    "motivation": "Motivation",
+    "stance": "Stance",
+    "none": "None",
+    "preservation": "Preservation 1",
+    "preservation2": "Preservation 2",
+    "leisure": "Leisure",
+    "strength": "Strength 1",
+    "strength2": "Strength 2",
+    "fullPower": "Full power",
+    "fullPowerCharge": "Full power charge",
+    "lockStanceTurns": "Lock stance turns",
+    "enthusiasm": "Enthusiasm",
+    "enthusiasmBonus": "Enthusiasm bonus",
+    "halfCostTurns": "Half cost turns",
+    "doubleCostTurns": "Double cost turns",
+    "costReduction": "Cost reduction",
+    "costIncrease": "Cost increase",
+    "doubleCardEffectCards": "Repeat card effects",
+    "nullifyGenkiTurns": "Nullify genki turns",
+    "nullifyDebuff": "Nullify debuff",
+    "poorConditionTurns": "Poor condition",
+    "nullifyCostCards": "Nullify cost cards",
+    "noActiveTurns": "No active cards",
+    "noMentalTurns": "No mental cards",
+    "uneaseTurns": "Unease",
+    "scoreBuff": "Score increase buff",
+    "goodImpressionTurnsBuff": "Good impression increase buff",
+    "turn": "Turn",
+    "cardDrawn": "Card drawn",
+    "upgradedHand": "Upgraded all cards in hand",
+    "exchangedHand": "Exchanged all cards in hand",
+    "setEffect": "Set effect",
+    "addedCardToHand": "Added card to hand",
+    "addedCardToTopOfDeck": "Added card to top of deck",
+    "upgradedCard": "Upgraded card",
+    "cardGrowth": "Card growth",
+    "heldCard": "Held card",
+    "discardedCard": "Discarded card",
+    "movedCardToHand": "Moved card to hand",
+    "effect": "Effect",
+    "stageEffect": "Stage effect",
+    "skillCard": "Skill card",
+    "pItem": "P-item",
+    "numTurns": "{num} {num, plural, =1 {turn} other {turns}}",
+    "hand": "Hand",
+    "turnN": "Turn {n}",
+    "average": "Average",
+    "unplayable": "Unplayable"
+  },
+  "BoxPlot": {
+    "max": "Max",
+    "q3": "Q3",
+    "mean": "Average",
+    "median": "Median",
+    "q1": "Q1",
+    "min": "Min"
+  },
+  "Rehearsal": {
+    "addScreenshots": "Add screenshots of the rehearsal result screen to parse scores from.",
+    "accuracyNotGuaranteed": "Accuracy is not guaranteed. It is recommended to manually verify the results by comparing with your screenshots.",
+    "stage": "Stage {n}"
+  }
+}

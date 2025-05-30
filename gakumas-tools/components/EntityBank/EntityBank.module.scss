@@ -1,0 +1,45 @@
+@use "../../styles/colors";
+
+.entities {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 68px);
+  grid-auto-rows: 68px;
+  gap: 8px;
+  justify-content: space-around;
+  padding: 8px;
+  overflow-y: scroll;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 4px;
+}
+
+.defaultFilters {
+  display: flex;
+  flex: 1;
+}
+
+.customFilters {
+  display: flex;
+  gap: 4px;
+}
+
+.toggle {
+  gap: 4px;
+  border: 2px solid colors.$gray-light;
+  border-radius: 22px;
+  padding: 8px;
+  color: colors.$gray;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.enabled {
+  border-color: colors.$gk-red-orange-dark;
+  background-color: colors.$gk-orange-extra-light;
+  color: colors.$gk-red-orange-dark;
+}

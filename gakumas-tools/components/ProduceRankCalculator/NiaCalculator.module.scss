@@ -1,0 +1,124 @@
+@use "sass:color";
+@use "../../styles/colors";
+
+.bonus {
+  font-size: 0.8em;
+}
+
+.nia section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+  border: 2px solid colors.$gray-light;
+  border-radius: 8px;
+  padding: 12px 16px 16px;
+}
+
+.idolSelect {
+  align-self: flex-start;
+}
+
+.recommendedScores {
+  table {
+    height: 0;
+    text-align: center;
+
+    thead,
+    tbody {
+      background: none;
+    }
+  }
+
+  th {
+    background-color: colors.$gray;
+    color: colors.$white;
+    width: 22%;
+  }
+
+  th:nth-child(1) {
+    width: 34%;
+  }
+
+  th:nth-child(2) {
+    background-color: colors.$vocal;
+  }
+
+  th:nth-child(3) {
+    background-color: colors.$dance;
+  }
+
+  th:nth-child(4) {
+    background-color: colors.$visual;
+  }
+
+  td {
+    color: colors.$black-dark;
+  }
+
+  td:nth-child(1) {
+    padding: 0;
+    background-color: colors.$gray-extra-light;
+  }
+
+  td:nth-child(2) {
+    background-color: color.scale(colors.$vocal, $alpha: -50%);
+  }
+
+  td:nth-child(3) {
+    background-color: color.scale(colors.$dance, $alpha: -50%);
+  }
+
+  td:nth-child(4) {
+    background-color: color.scale(colors.$visual, $alpha: -50%);
+  }
+
+  button {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    padding: 0 8px;
+    color: colors.$gray;
+  }
+
+  .rankButtonLabel {
+    flex: 1;
+    color: colors.$black-dark;
+  }
+}
+
+.note a {
+  color: colors.$blue;
+}
+
+.flex {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  text-align: center;
+}
+
+.produceRank {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 8px;
+
+  span {
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+@container (width < 530px) {
+  .recommendedScores {
+    font-size: 12px;
+
+    th,
+    td {
+      padding: 4px 0;
+      overflow: hidden;
+    }
+  }
+}

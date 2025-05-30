@@ -1,0 +1,23 @@
+@use "../../styles/mixins";
+@use "../../styles/colors";
+
+.badges {
+  display: flex;
+  justify-content: space-around;
+  margin: 4px 0;
+}
+
+.badge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  padding: 2px;
+  background-color: colors.$white;
+  border-radius: 50vh;
+
+  @include mixins.param-colors using ($param-color) {
+    color: $param-color;
+    box-shadow: 0 0 8px $param-color;
+  }
+}

@@ -1,0 +1,27 @@
+@use "../../styles/colors";
+
+.buttonGroup {
+  display: flex;
+  border: 1px solid colors.$gk-orange;
+  border-radius: 4px;
+  overflow: hidden;
+
+  button {
+    flex: 1;
+    padding: 6px;
+    color: colors.$gk-orange;
+    font-size: 14px;
+    line-height: 16px;
+    transition: all 0.2s;
+
+    &.selected {
+      background-color: colors.$gk-orange;
+      color: colors.$white;
+    }
+
+    &:hover {
+      background-color: colors.$gk-orange-extra-light;
+      color: colors.$gk-red-orange;
+    }
+  }
+}
