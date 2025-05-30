@@ -1,1 +1,1 @@
-export { default } from "./DeckExplorer";
+export { default } from "./Simulator";

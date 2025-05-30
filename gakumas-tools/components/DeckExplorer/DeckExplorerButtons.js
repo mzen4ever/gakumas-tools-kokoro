@@ -7,7 +7,7 @@ import ConfirmModal from "@/components/ConfirmModal";
 import LoadoutManagerModal from "@/components/LoadoutManagerModal";
 import LoadoutContext from "@/contexts/LoadoutContext";
 import ModalContext from "@/contexts/ModalContext";
-import styles from "./DeckExplorer.module.scss";
+import styles from "./DeckExplorer.module.scss"; // 修正ポイント
 
 function DeckExplorerButtons() {
   const t = useTranslations("DeckExplorerButtons");

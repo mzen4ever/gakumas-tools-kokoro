@@ -1,5 +1,3 @@
-// components/DeckExplorer/DeckExplorer.js
-
 "use client";
 import {
   useCallback,
@@ -23,7 +21,6 @@ import KofiAd from "@/components/KofiAd";
 import Loader from "@/components/Loader";
 import LoadoutSkillCardGroup from "@/components/LoadoutSkillCardGroup";
 import ParametersInput from "@/components/ParametersInput";
-import SimulatorResult from "@/components/SimulatorResult";
 import StagePItems from "@/components/StagePItems";
 import StageSelect from "@/components/StageSelect";
 import LoadoutContext from "@/contexts/LoadoutContext";
@@ -89,22 +86,28 @@ export default function DeckExplorer() {
 
   useEffect(() => {
     if (simulatorData) {
-      document.getElementById("simulator_result").scrollIntoView({
+      document.getElementById("simulator_result")?.scrollIntoView({
         behavior: "smooth",
       });
     }
   }, [simulatorData]);
 
-  const setResult = useCallback((result) => {
-    const bucketedScores = bucketScores(result.scores);
-    const medianScore = getMedianScore(result.scores);
-    console.timeEnd("simulation");
-    setSimulatorData({ bucketedScores, medianScore, ...result });
-    setRunning(false);
-  }, []);
+  const setResult = useCallback(
+    (result) => {
+      const bucketedScores = bucketScores(result.scores);
+      const medianScore = getMedianScore(result.scores);
+
+      console.timeEnd("simulation");
+
+      setSimulatorData({ bucketedScores, medianScore, ...result });
+      setRunning(false);
+    },
+    [setSimulatorData, setRunning]
+  );
 
   function runSimulation() {
     setRunning(true);
+
     console.time("simulation");
 
     if (SYNC || !workersRef.current) {
@@ -113,8 +116,8 @@ export default function DeckExplorer() {
     } else {
       const numWorkers = workersRef.current.length;
       const runsPerWorker = Math.round(NUM_RUNS / numWorkers);
-      let promises = [];
 
+      let promises = [];
       for (let i = 0; i < numWorkers; i++) {
         promises.push(
           new Promise((resolve) => {
@@ -133,7 +136,7 @@ export default function DeckExplorer() {
         setResult(mergedResults);
         pushLoadoutHistory();
 
-        logEvent("deckexplorer.simulate", {
+        logEvent("simulator.simulate", {
           stageId: stage.id,
           idolId: config.idol.idolId,
           page_location: simulatorUrl,
@@ -146,10 +149,10 @@ export default function DeckExplorer() {
   }
 
   return (
-    <div id="deckexplorer_loadout" className={styles.loadoutEditor}>
+    <div id="simulator_loadout" className={styles.loadoutEditor}>
       <div className={styles.configurator}>
         <StageSelect />
-        {stage.type === "event" ? (
+        {stage.type == "event" ? (
           t("enterPercents")
         ) : (
           <div className={styles.supportBonusInput}>
@@ -173,12 +176,13 @@ export default function DeckExplorer() {
           />
           <div className={styles.typeMultipliers}>
             {Object.keys(config.typeMultipliers).map((param) => (
-              <div key={param}>{Math.round(config.typeMultipliers[param] * 100)}%</div>
+              <div key={param}>
+                {Math.round(config.typeMultipliers[param] * 100)}%
+              </div>
             ))}
             <div />
           </div>
         </div>
-
         <div className={styles.pItemsRow}>
           <div className={styles.pItems}>
             <StagePItems
@@ -190,7 +194,6 @@ export default function DeckExplorer() {
           </div>
           <span>{formatStageShortName(stage, t)}</span>
         </div>
-
         {loadout.skillCardIdGroups.map((skillCardIdGroup, i) => (
           <LoadoutSkillCardGroup
             key={i}
@@ -201,9 +204,7 @@ export default function DeckExplorer() {
             idolId={config.idol.idolId || idolId}
           />
         ))}
-
         <DeckExplorerSubTools defaultCardIds={config.defaultCardIds} />
-
         <select
           className={styles.strategySelect}
           value={strategy}
@@ -215,17 +216,16 @@ export default function DeckExplorer() {
             </option>
           ))}
         </select>
-
         <Button style="blue" onClick={runSimulation} disabled={running}>
           {running ? <Loader /> : t("simulate")}
         </Button>
-
         <DeckExplorerButtons />
-
         <div className={styles.url}>{simulatorUrl}</div>
         <div className={styles.subLinks}>
           <a
-            href={`https://docs.google.com/forms/d/e/1FAIpQLScNquedw8Lp2yVfZjoBFMjQxIFlX6-rkzDWIJTjWPdQVCJbiQ/viewform?usp=pp_url&entry.1787906485=${encodeURIComponent(simulatorUrl)}`}
+            href={`https://docs.google.com/forms/d/e/1FAIpQLScNquedw8Lp2yVfZjoBFMjQxIFlX6-rkzDWIJTjWPdQVCJbiQ/viewform?usp=pp_url&entry.1787906485=${encodeURIComponent(
+              simulatorUrl
+            )}`}
             target="_blank"
           >
             {t("provideData")}
@@ -237,7 +237,6 @@ export default function DeckExplorer() {
             {t("lastUpdated")}: 2025-05-28
           </a>
         </div>
-
         {!simulatorData && <div className={styles.ad}><KofiAd /></div>}
       </div>
 
