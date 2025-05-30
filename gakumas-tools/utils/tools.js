@@ -44,4 +44,8 @@ export const TOOLS = {
     path: "/rehearsal",
     pinnable: true,
   },
+  deckexplorer: {
+    icon: "emoji",
+    path: "/deckexplorer"
+  },
 };

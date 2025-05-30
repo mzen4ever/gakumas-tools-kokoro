@@ -39,6 +39,10 @@
     "rehearsal": {
       "title": "リハーサル読み取り",
       "description": "リハーサル画面のスクショからスコアを読み取る"
+    },
+    "deckexplorer": {
+      "title": "最適カードデッキ探索",
+      "description": "ステージに合わせて高得点が出るカード組み合わせを自動探索する"
     }
   },
   "NavbarMenu": {
@@ -323,5 +327,15 @@
     "addScreenshots": "リハーサル結果画面のスクリーンショットからスコアを読み取ります。",
     "accuracyNotGuaranteed": "精度は保証できません。スクリーンショットと比較して、結果を確認することをお勧めします。",
     "stage": "ステージ{n}"
+  },
+  "DeckExplorerButtons": {
+  "confirm": "初期化しますか？",
+  "clear": "初期化",
+  "manageLoadouts": "保存・読込"
+  },
+  "DeckExplorerSubTools": {
+    "costRanges": "コスト範囲",
+    "history": "履歴",
+    "defaultCards": "基本カード"
   }
 }
