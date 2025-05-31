@@ -220,7 +220,7 @@ export default function DeckExplorer() {
         <Button style="blue" onClick={runSimulation} disabled={running}>
           {running ? <Loader /> : t("simulate")}
         </Button>
-        <DeckExplorerButtons />
+        {/* <DeckExplorerButtons />
         <div className={styles.url}>{simulatorUrl}</div>
         <div className={styles.subLinks}>
           <a
@@ -238,7 +238,7 @@ export default function DeckExplorer() {
             {t("lastUpdated")}: 2025-05-28
           </a>
         </div>
-        {!simulatorData && <div className={styles.ad}><KofiAd /></div>}
+        {!simulatorData && <div className={styles.ad}><KofiAd /></div>} */}
       </div>
 
       {simulatorData && (

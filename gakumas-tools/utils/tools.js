@@ -45,7 +45,7 @@ export const TOOLS = {
     pinnable: true,
   },
   deckexplorer: {
-    icon: "emoji",
+    icon: "risさん大好き",
     path: "/deckexplorer"
   },
 };
