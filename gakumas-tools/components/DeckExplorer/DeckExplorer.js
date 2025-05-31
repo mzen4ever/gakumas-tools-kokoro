@@ -21,6 +21,7 @@ import KofiAd from "@/components/KofiAd";
 import Loader from "@/components/Loader";
 import LoadoutSkillCardGroup from "@/components/LoadoutSkillCardGroup";
 import ParametersInput from "@/components/ParametersInput";
+import SimulatorResult from "@/components/SimulatorResult";
 import StagePItems from "@/components/StagePItems";
 import StageSelect from "@/components/StageSelect";
 import LoadoutContext from "@/contexts/LoadoutContext";
