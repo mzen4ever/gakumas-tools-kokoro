@@ -45,7 +45,7 @@ export const TOOLS = {
     pinnable: true,
   },
   deckexplorer: {
-    icon: "risさん大好き",
+    icon: "そろばんあじふらい",
     path: "/deckexplorer"
   },
 };
