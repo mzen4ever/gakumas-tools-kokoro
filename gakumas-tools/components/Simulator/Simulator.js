@@ -153,10 +153,9 @@ export default function Simulator() {
   return (
     <div id="simulator_loadout" className={styles.loadoutEditor}>
       <div className={styles.configurator}>
-        {/* <>
-          ※ Season 24 preview is based only on the announced p-items and
-          criteria. Turn types are not yet known.
-        </> */}
+        <>
+          ※ Season 25 score multiplier is inaccurate for parameters above 2400.
+        </>
         <StageSelect />
         {stage.type == "event" ? (
           t("enterPercents")
@@ -240,7 +239,7 @@ export default function Simulator() {
             href="https://github.com/surisuririsu/gakumas-tools/blob/master/gakumas-tools/simulator/CHANGELOG.md"
             target="_blank"
           >
-            {t("lastUpdated")}: 2025-05-28
+            {t("lastUpdated")}: 2025-06-02
           </a>
         </div>
         {!simulatorData && (

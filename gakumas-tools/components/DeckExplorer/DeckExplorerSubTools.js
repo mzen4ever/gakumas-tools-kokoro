@@ -1,4 +1,3 @@
-"use client";
 import { memo, useContext, useState } from "react";
 import { useTranslations } from "next-intl";
 import CostRanges from "@/components/CostRanges";
@@ -6,7 +5,7 @@ import LoadoutHistory from "@/components/LoadoutHistory";
 import DefaultCards from "@/components/DefaultCards";
 import LoadoutContext from "@/contexts/LoadoutContext";
 import c from "@/utils/classNames";
-import styles from "./DeckExplorer.module.scss"; // 修正ポイント
+import styles from "./DeckExplorer.module.scss";
 
 function DeckExplorerSubTools({ defaultCardIds }) {
   const t = useTranslations("DeckExplorerSubTools");
@@ -15,7 +14,7 @@ function DeckExplorerSubTools({ defaultCardIds }) {
   const [activeSubTool, setActiveSubTool] = useState(null);
 
   const toggleSubTool = (subTool) => {
-    setActiveSubTool(activeSubTool === subTool ? null : subTool);
+    setActiveSubTool(activeSubTool == subTool ? null : subTool);
   };
 
   return (
@@ -42,9 +41,9 @@ function DeckExplorerSubTools({ defaultCardIds }) {
         </button>
       </div>
 
-      {activeSubTool === "costRanges" && <CostRanges />}
-      {activeSubTool === "history" && <LoadoutHistory />}
-      {activeSubTool === "defaultCards" && defaultCardIds && (
+      {activeSubTool == "costRanges" && <CostRanges />}
+      {activeSubTool == "history" && <LoadoutHistory />}
+      {activeSubTool == "defaultCards" && defaultCardIds && (
         <DefaultCards skillCardIds={defaultCardIds} />
       )}
     </>
