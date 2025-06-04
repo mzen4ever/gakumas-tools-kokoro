@@ -1,0 +1,194 @@
+@use "../../styles/colors";
+
+.simulatorLogs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: colors.$black-dark;
+}
+
+.logs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.turn {
+  border-left: 4px solid;
+  margin-bottom: -8px;
+
+  &.vocal {
+    border-color: colors.$vocal-light;
+  }
+  &.dance {
+    border-color: colors.$dance-light;
+  }
+  &.visual {
+    border-color: colors.$visual-light;
+  }
+
+  .childLogs {
+    padding: 12px;
+    padding-right: 0;
+  }
+}
+
+.startTurn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 0 16px 2px 0;
+  padding: 6px;
+  padding-left: 8px;
+  color: colors.$gray-dark;
+  font-weight: 600;
+  color: colors.$white;
+
+  &.vocal {
+    background-color: colors.$vocal-light;
+  }
+  &.dance {
+    background-color: colors.$dance-light;
+  }
+  &.visual {
+    background-color: colors.$visual-light;
+  }
+}
+
+.tile {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.defaultTile {
+  @extend .tile;
+  align-self: flex-start;
+  padding: 8px;
+  background-color: colors.$gray-extra-light;
+}
+
+.drawCard {
+  @extend .tile;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background-color: colors.$gray-extra-light;
+  font-size: 14px;
+}
+
+.group {
+  @extend .tile;
+  border: 2px solid colors.$gray-extra-light;
+
+  .entity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background-color: colors.$gray-extra-light;
+  }
+
+  .childLogs {
+    padding: 12px;
+  }
+
+  .effect {
+    width: 17px;
+    height: 17px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transform: rotate(-45deg);
+
+    img {
+      transform: rotate(45deg);
+    }
+  }
+}
+
+.positive {
+  color: colors.$blue;
+  font-weight: 600;
+}
+
+.negative {
+  color: colors.$red;
+  font-weight: 600;
+}
+
+.hand {
+  @extend .tile;
+  border: 2px solid colors.$gray-extra-light;
+  overflow: visible;
+
+  .handTitle {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    background-color: colors.$gray-extra-light;
+
+    button {
+      color: colors.$gray-dark;
+    }
+  }
+
+  .state {
+    border-bottom: 2px solid colors.$gray-extra-light;
+    padding: 16px;
+  }
+
+  .handCards {
+    display: flex;
+    align-items: stretch;
+    padding: 16px 8px 8px;
+  }
+
+  .handCard {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .imgWrapper {
+    width: 60px;
+  }
+
+  .selected img {
+    border-radius: 4px;
+    box-shadow: 0 0 8px colors.$gk-orange;
+    overflow: hidden;
+  }
+
+  .selected {
+    color: colors.$gk-orange;
+    font-weight: 600;
+  }
+
+  .unusable {
+    filter: brightness(0.6);
+  }
+
+  .cardScore {
+    font-size: 12px;
+  }
+}
+
+.blue {
+  color: colors.$blue;
+  font-weight: 600;
+}
+
+.toTop {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 8px;
+  color: colors.$blue;
+}

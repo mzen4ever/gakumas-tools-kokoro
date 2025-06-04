@@ -1,0 +1,32 @@
+@use "sass:color";
+@use "../../styles/colors";
+
+.result {
+  flex: 1;
+  max-width: Min(100%, 800px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+
+  .graphSelect button {
+    font-size: 20px;
+    padding: 6px;
+  }
+}
+
+.stats {
+  text-align: center;
+
+  thead {
+    background-color: color.adjust(colors.$gk-orange, $lightness: 20%);
+  }
+
+  tbody {
+    background-color: color.adjust(colors.$gk-orange, $lightness: 40%);
+  }
+
+  th {
+    width: 25%;
+  }
+}

@@ -1,3 +1,4 @@
+// DeckExplorer.js
 "use client";
 import {
   useCallback,
@@ -36,9 +37,9 @@ import {
   getIndications,
 } from "@/utils/simulator";
 import { formatStageShortName } from "@/utils/stages";
-import DeckExplorerButtons from "./DeckExplorerButtons";
-import DeckExplorerSubTools from "./DeckExplorerSubTools";
-import styles from "./DeckExplorer.module.scss";
+import DeckExplorerButtons from "@/components/DeckExplorer/DeckExplorerButtons";
+import DeckExplorerSubTools from "@/components/DeckExplorer/DeckExplorerSubTools";
+import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 
 export default function DeckExplorer() {
   const t = useTranslations("Simulator");
@@ -220,36 +221,11 @@ export default function DeckExplorer() {
         <Button style="blue" onClick={runSimulation} disabled={running}>
           {running ? <Loader /> : t("simulate")}
         </Button>
-        {/* <DeckExplorerButtons />
+        <DeckExplorerButtons />
         <div className={styles.url}>{simulatorUrl}</div>
-        <div className={styles.subLinks}>
-          <a
-            href={`https://docs.google.com/forms/d/e/1FAIpQLScNquedw8Lp2yVfZjoBFMjQxIFlX6-rkzDWIJTjWPdQVCJbiQ/viewform?usp=pp_url&entry.1787906485=${encodeURIComponent(
-              simulatorUrl
-            )}`}
-            target="_blank"
-          >
-            {t("provideData")}
-          </a>
-          <a
-            href="https://github.com/surisuririsu/gakumas-tools/blob/master/gakumas-tools/simulator/CHANGELOG.md"
-            target="_blank"
-          >
-            {t("lastUpdated")}: 2025-05-28
-          </a>
-        </div>
-        {!simulatorData && <div className={styles.ad}><KofiAd /></div>} */}
       </div>
-
-      {simulatorData && (
-        <SimulatorResult
-          data={simulatorData}
-          idolId={config.idol.idolId || idolId}
-          plan={config.idol.plan || plan}
-        />
-      )}
-
-      <Tooltip id="indications-tooltip" />
+      {simulatorData && <SimulatorResult data={simulatorData} />}
+      <KofiAd />
     </div>
   );
 }

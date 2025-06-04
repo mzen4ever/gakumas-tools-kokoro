@@ -1,13 +1,17 @@
 "use client";
+
 import { memo, useContext, useState } from "react";
 import { useTranslations } from "next-intl";
 import { FaCheck, FaRegCopy } from "react-icons/fa6";
+
 import Button from "@/components/Button";
 import ConfirmModal from "@/components/ConfirmModal";
 import LoadoutManagerModal from "@/components/LoadoutManagerModal";
+
 import LoadoutContext from "@/contexts/LoadoutContext";
 import ModalContext from "@/contexts/ModalContext";
-import styles from "./DeckExplorer.module.scss";
+
+import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 
 function DeckExplorerButtons() {
   const t = useTranslations("DeckExplorerButtons");
