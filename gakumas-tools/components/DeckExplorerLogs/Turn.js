@@ -2,7 +2,7 @@ import { memo } from "react";
 import { useTranslations } from "next-intl";
 import Logs from "./Logs";
 import c from "@/utils/classNames";
-import styles from "./SimulatorLogs.module.scss";
+import styles from "./DeckExplorerLogs.module.scss";
 
 function Turn({ num, type, multiplier, childLogs, idolId }) {
   const t = useTranslations("stage");

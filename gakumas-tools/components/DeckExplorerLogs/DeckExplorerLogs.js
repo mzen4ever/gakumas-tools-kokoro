@@ -2,10 +2,10 @@ import { memo, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { FaCircleArrowUp } from "react-icons/fa6";
 import ButtonGroup from "@/components/ButtonGroup";
-import styles from "./SimulatorLogs.module.scss";
+import styles from "./DeckExplorerLogs.module.scss";
 import Logs from "./Logs";
 
-function SimulatorLogs({ minRun, averageRun, maxRun, idolId }) {
+function DeckExplorerLogs({ minRun, averageRun, maxRun, idolId }) {
   const t = useTranslations("SimulatorResult");
 
   const OPTIONS = useMemo(
@@ -81,4 +81,4 @@ function SimulatorLogs({ minRun, averageRun, maxRun, idolId }) {
   );
 }
 
-export default memo(SimulatorLogs);
+export default memo(DeckExplorerLogs);

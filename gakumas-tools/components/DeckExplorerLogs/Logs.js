@@ -7,7 +7,7 @@ import Hand from "./Hand";
 import SetBuff from "./SetBuff";
 import Tile from "./Tile";
 import Turn from "./Turn";
-import styles from "./SimulatorLogs.module.scss";
+import styles from "./DeckExplorerLogs.module.scss";
 
 function Log({ line, idolId }) {
   const t = useTranslations("stage");

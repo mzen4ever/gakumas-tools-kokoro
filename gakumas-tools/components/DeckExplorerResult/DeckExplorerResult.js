@@ -1,11 +1,11 @@
 import { memo } from "react";
 import { useTranslations } from "next-intl";
-import SimulatorLogs from "@/components/SimulatorLogs";
-import SimulatorResultGraphs from "./SimulatorResultGraphs";
-import styles from "./SimulatorResult.module.scss";
-import KofiAd from "../KofiAd";
+import DeckExplorerLogs from "@/components/DeckExplorerLogs/DeckExplorerLogs";
+import DeckExplorerResultGraphs from "./DeckExplorerResultGraphs";
+import styles from "./DeckExplorerResult.module.scss";
+import KofiAd from "@/components/KofiAd";
 
-function SimulatorResult({ data, idolId, plan }) {
+function DeckExplorerResult({ data, idolId, plan }) {
   const t = useTranslations("SimulatorResult");
 
   return (
@@ -29,10 +29,10 @@ function SimulatorResult({ data, idolId, plan }) {
         </tbody>
       </table>
 
-      <SimulatorResultGraphs data={data} plan={plan} />
+      <DeckExplorerResultGraphs data={data} plan={plan} />
 
       <label>{t("logs")}</label>
-      <SimulatorLogs
+      <DeckExplorerLogs
         minRun={data.minRun}
         averageRun={data.averageRun}
         maxRun={data.maxRun}
@@ -44,4 +44,4 @@ function SimulatorResult({ data, idolId, plan }) {
   );
 }
 
-export default memo(SimulatorResult);
+export default memo(DeckExplorerResult);

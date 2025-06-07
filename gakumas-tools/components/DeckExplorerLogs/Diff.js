@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { useTranslations } from "next-intl";
 import { ALL_FIELDS, DEBUFF_FIELDS } from "gakumas-engine";
-import styles from "./SimulatorLogs.module.scss";
+import styles from "./DeckExplorerLogs.module.scss";
 
 function Diff({ field, next, prev }) {
   const t = useTranslations("stage");

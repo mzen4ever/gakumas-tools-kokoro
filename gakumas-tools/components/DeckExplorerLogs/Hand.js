@@ -6,7 +6,7 @@ import { ALL_FIELDS, S } from "gakumas-engine";
 import EntityIcon from "@/components/EntityIcon";
 import c from "@/utils/classNames";
 import { EntityTypes } from "@/utils/entities";
-import styles from "./SimulatorLogs.module.scss";
+import styles from "./DeckExplorerLogs.module.scss";
 
 function HandStateLine({ k, state }) {
   const t = useTranslations("stage");

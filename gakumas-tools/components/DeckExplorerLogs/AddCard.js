@@ -2,7 +2,7 @@ import { memo } from "react";
 import { SkillCards } from "gakumas-data";
 import gkImg from "gakumas-images";
 import Image from "@/components/Image";
-import styles from "./SimulatorLogs.module.scss";
+import styles from "./DeckExplorerLogs.module.scss";
 
 function AddCard({ id, idolId, text }) {
   const skillCard = SkillCards.getById(id);

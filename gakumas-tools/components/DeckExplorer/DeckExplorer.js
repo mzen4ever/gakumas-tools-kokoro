@@ -22,7 +22,7 @@ import KofiAd from "@/components/KofiAd";
 import Loader from "@/components/Loader";
 import LoadoutSkillCardGroup from "@/components/LoadoutSkillCardGroup";
 import ParametersInput from "@/components/ParametersInput";
-import SimulatorResult from "@/components/SimulatorResult";
+
 import StagePItems from "@/components/StagePItems";
 import StageSelect from "@/components/StageSelect";
 import LoadoutContext from "@/contexts/LoadoutContext";
@@ -39,6 +39,7 @@ import {
 import { formatStageShortName } from "@/utils/stages";
 import DeckExplorerButtons from "@/components/DeckExplorer/DeckExplorerButtons";
 import DeckExplorerSubTools from "@/components/DeckExplorer/DeckExplorerSubTools";
+import DeckExplorerResult from "@/components/DeckExplorerResult/DeckExplorerResult";
 import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 
 export default function DeckExplorer() {
@@ -224,7 +225,9 @@ export default function DeckExplorer() {
         <DeckExplorerButtons />
         <div className={styles.url}>{simulatorUrl}</div>
       </div>
-      {simulatorData && <SimulatorResult data={simulatorData} />}
+      {simulatorData && (
+      <DeckExplorerResult data={simulatorData} plan={plan} idolId={idolId} />
+      )}
       <KofiAd />
     </div>
   );

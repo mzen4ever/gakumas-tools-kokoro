@@ -4,7 +4,7 @@ import { PItems, SkillCards } from "gakumas-data";
 import gkImg from "gakumas-images";
 import Image from "@/components/Image";
 import Logs from "./Logs";
-import styles from "./SimulatorLogs.module.scss";
+import styles from "./DeckExplorerLogs.module.scss";
 
 function Group({ entity, childLogs, idolId }) {
   const t = useTranslations("stage");

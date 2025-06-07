@@ -10,13 +10,13 @@ import BoxPlot from "@/components/BoxPlot";
 import ButtonGroup from "@/components/ButtonGroup";
 import DistributionPlot from "@/components/DistributionPlot";
 import { NUM_RUNS } from "@/simulator/constants";
-import styles from "./SimulatorResult.module.scss";
+import styles from "./DeckExplorerResult.module.scss";
 
 const HISTOGRAM = <AiOutlineBarChart />;
 const BOXPLOT = <AiOutlineBoxPlot />;
 const AREA = <AiOutlineAreaChart />;
 
-export default function SimulatorResultGraphs({ data, plan }) {
+export default function DeckExplorerResultGraphs({ data, plan }) {
   const t = useTranslations("SimulatorResultGraphs");
 
   const [graphType, setGraphType] = useState("histogram");
