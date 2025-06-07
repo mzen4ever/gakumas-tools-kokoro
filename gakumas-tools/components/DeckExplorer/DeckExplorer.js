@@ -1,4 +1,3 @@
-// DeckExplorer.js
 "use client";
 import {
   useCallback,
@@ -16,19 +15,21 @@ import {
   IdolStageConfig,
   STRATEGIES,
 } from "gakumas-engine";
+
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import KofiAd from "@/components/KofiAd";
 import Loader from "@/components/Loader";
 import LoadoutSkillCardGroup from "@/components/LoadoutSkillCardGroup";
 import ParametersInput from "@/components/ParametersInput";
-
 import StagePItems from "@/components/StagePItems";
 import StageSelect from "@/components/StageSelect";
+
 import LoadoutContext from "@/contexts/LoadoutContext";
 import WorkspaceContext from "@/contexts/WorkspaceContext";
+
 import { simulate } from "@/simulator";
-import { MAX_WORKERS, NUM_RUNS, SYNC } from "@/simulator/constants";
+import { MAX_WORKERS, SYNC } from "@/simulator/constants";
 import { logEvent } from "@/utils/logging";
 import {
   bucketScores,
@@ -37,10 +38,15 @@ import {
   getIndications,
 } from "@/utils/simulator";
 import { formatStageShortName } from "@/utils/stages";
+
 import DeckExplorerButtons from "@/components/DeckExplorer/DeckExplorerButtons";
 import DeckExplorerSubTools from "@/components/DeckExplorer/DeckExplorerSubTools";
 import DeckExplorerResult from "@/components/DeckExplorerResult/DeckExplorerResult";
+
 import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
+
+// DeckExplorer 専用の実行回数（例: 100回）
+const DE_NUM_RUNS = 200;
 
 export default function DeckExplorer() {
   const t = useTranslations("Simulator");
@@ -55,6 +61,7 @@ export default function DeckExplorer() {
     pushLoadoutHistory,
   } = useContext(LoadoutContext);
   const { plan, idolId } = useContext(WorkspaceContext);
+
   const [strategy, setStrategy] = useState("HeuristicStrategy");
   const [simulatorData, setSimulatorData] = useState(null);
   const [running, setRunning] = useState(false);
@@ -96,17 +103,25 @@ export default function DeckExplorer() {
   }, [simulatorData]);
 
   const setResult = useCallback(
-    (result) => {
-      const bucketedScores = bucketScores(result.scores);
-      const medianScore = getMedianScore(result.scores);
+  (result) => {
+    const bucketedScores = bucketScores(result.scores);
+    const medianScore = getMedianScore(result.scores);
 
-      console.timeEnd("simulation");
+    console.timeEnd("simulation");
 
-      setSimulatorData({ bucketedScores, medianScore, ...result });
-      setRunning(false);
+    // 追加: スコア出力
+    console.log("All simulation scores:", result.scores);
+    const average = (
+      result.scores.reduce((sum, val) => sum + val, 0) / result.scores.length
+    ).toFixed(2);
+    console.log(`Average Score: ${average}`);
+
+    setSimulatorData({ bucketedScores, medianScore, ...result });
+    setRunning(false);
     },
     [setSimulatorData, setRunning]
   );
+
 
   function runSimulation() {
     setRunning(true);
@@ -114,11 +129,11 @@ export default function DeckExplorer() {
     console.time("simulation");
 
     if (SYNC || !workersRef.current) {
-      const result = simulate(config, strategy, NUM_RUNS);
+      const result = simulate(config, strategy, DE_NUM_RUNS);
       setResult(result);
     } else {
       const numWorkers = workersRef.current.length;
-      const runsPerWorker = Math.round(NUM_RUNS / numWorkers);
+      const runsPerWorker = Math.round(DE_NUM_RUNS / numWorkers);
 
       let promises = [];
       for (let i = 0; i < numWorkers; i++) {
@@ -155,7 +170,7 @@ export default function DeckExplorer() {
     <div id="simulator_loadout" className={styles.loadoutEditor}>
       <div className={styles.configurator}>
         <StageSelect />
-        {stage.type == "event" ? (
+        {stage.type === "event" ? (
           t("enterPercents")
         ) : (
           <div className={styles.supportBonusInput}>
@@ -186,6 +201,7 @@ export default function DeckExplorer() {
             <div />
           </div>
         </div>
+
         <div className={styles.pItemsRow}>
           <div className={styles.pItems}>
             <StagePItems
@@ -197,6 +213,7 @@ export default function DeckExplorer() {
           </div>
           <span>{formatStageShortName(stage, t)}</span>
         </div>
+
         {loadout.skillCardIdGroups.map((skillCardIdGroup, i) => (
           <LoadoutSkillCardGroup
             key={i}
@@ -207,7 +224,9 @@ export default function DeckExplorer() {
             idolId={config.idol.idolId || idolId}
           />
         ))}
+
         <DeckExplorerSubTools defaultCardIds={config.defaultCardIds} />
+
         <select
           className={styles.strategySelect}
           value={strategy}
@@ -219,15 +238,19 @@ export default function DeckExplorer() {
             </option>
           ))}
         </select>
+
         <Button style="blue" onClick={runSimulation} disabled={running}>
           {running ? <Loader /> : t("simulate")}
         </Button>
+
         <DeckExplorerButtons />
         <div className={styles.url}>{simulatorUrl}</div>
       </div>
+
       {simulatorData && (
-      <DeckExplorerResult data={simulatorData} plan={plan} idolId={idolId} />
+        <DeckExplorerResult data={simulatorData} plan={plan} idolId={idolId} />
       )}
+
       <KofiAd />
     </div>
   );
