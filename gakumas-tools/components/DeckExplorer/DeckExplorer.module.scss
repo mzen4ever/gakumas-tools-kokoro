@@ -114,3 +114,28 @@
 .ad {
   margin-bottom: 16px;
 }
+
+.comboRow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.comboGroup {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.comboIcons {
+  display: flex;
+  gap: 4px;
+  min-width: 360px; /* アイコン並びに固定幅を確保 */
+}
+
+.comboScore {
+  font-weight: bold;
+  font-size: 14px;
+}
