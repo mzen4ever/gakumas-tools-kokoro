@@ -30,24 +30,19 @@ import LoadoutContext from "@/contexts/LoadoutContext";
 import WorkspaceContext from "@/contexts/WorkspaceContext";
 
 import { simulate } from "@/simulator";
-import { MAX_WORKERS, SYNC } from "@/simulator/constants";
-import { logEvent } from "@/utils/logging";
+import { MAX_WORKERS } from "@/simulator/constants";
 import {
   bucketScores,
   getMedianScore,
-  mergeResults,
   getIndications,
 } from "@/utils/simulator";
 import { formatStageShortName } from "@/utils/stages";
 import { EntityTypes } from "@/utils/entities";
 
-import DeckExplorerButtons from "@/components/DeckExplorer/DeckExplorerButtons";
 import DeckExplorerSubTools from "@/components/DeckExplorer/DeckExplorerSubTools";
-// import DeckExplorerResult from "@/components/DeckExplorerResult/DeckExplorerResult";
-
 import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 
-const DE_NUM_RUNS = 50;
+const DE_NUM_RUNS = 200;
 
 function generateItemCombos(currentItems, candidates) {
   const fixed = currentItems.find((id) => id !== null); // 最初のnullでないアイテム
@@ -83,6 +78,7 @@ export default function DeckExplorer() {
     setSupportBonus,
     setParams,
     replacePItemId,
+    setLoadout, // ✅ 追加
   } = useContext(LoadoutContext);
   const { idolId } = useContext(WorkspaceContext);
 
@@ -91,6 +87,7 @@ export default function DeckExplorer() {
   const [itemCandidates, setItemCandidates] = useState([null, null, null]);
   const [running, setRunning] = useState(false);
   const [topCombos, setTopCombos] = useState([]);
+  const [savedLoadout, setSavedLoadout] = useState(null);
   const workersRef = useRef();
 
   const config = useMemo(() => {
@@ -118,21 +115,6 @@ export default function DeckExplorer() {
     return () => workersRef.current?.forEach((worker) => worker.terminate());
   }, []);
 
-  const setResult = useCallback(
-    (result) => {
-      const bucketedScores = bucketScores(result.scores);
-      const medianScore = getMedianScore(result.scores);
-      console.timeEnd("simulation");
-      const average = (
-        result.scores.reduce((sum, val) => sum + val, 0) / result.scores.length
-      ).toFixed(2);
-      console.log(`Average Score: ${average}`);
-      setSimulatorData({ bucketedScores, medianScore, ...result });
-      setRunning(false);
-    },
-    [setSimulatorData, setRunning]
-  );
-
   function replaceItemCandidate(index, id) {
     const updated = [...itemCandidates];
     updated[index] = id;
@@ -147,7 +129,6 @@ export default function DeckExplorer() {
     const scored = [];
 
     for (const combo of combos) {
-      console.log("DEBUG combo:", combo);
       const newLoadout = { ...loadout, pItemIds: combo };
       const newConfig = new IdolStageConfig(
         new IdolConfig(newLoadout),
@@ -160,12 +141,38 @@ export default function DeckExplorer() {
     }
 
     scored.sort((a, b) => b.avg - a.avg);
-    setResult(scored[0].result);
+    setSimulatorData(scored[0].result);
     setTopCombos(scored.slice(0, 5));
+    setRunning(false);
+    console.timeEnd("simulation");
+  }
+
+  function saveCurrentLoadout() {
+    const saved = {
+      ...loadout,
+      skillCardIdGroups: loadout.skillCardIdGroups || [],
+      customizationGroups: loadout.customizationGroups || [],
+    };
+    localStorage.setItem("deckExplorerSavedLoadout", JSON.stringify(saved));
+    alert("ローカルに保存しました。");
+  }
+
+  function loadSavedLoadout() {
+    const data = localStorage.getItem("deckExplorerSavedLoadout");
+    if (!data) return alert("保存されたデッキが見つかりません。");
+
+    try {
+      const saved = JSON.parse(data);
+      setLoadout(saved); // ✅ 一括で反映
+      alert("デッキを復元しました。");
+    } catch (err) {
+      console.error("Load error:", err);
+      alert("読み込みに失敗しました。");
+    }
   }
 
   return (
-    <div id="simulator_loadout" className={styles.loadoutEditor}>
+    <div className={styles.loadoutEditor}>
       <div className={styles.configurator}>
         <StageSelect />
         {stage.type === "event" ? (
@@ -249,7 +256,11 @@ export default function DeckExplorer() {
           {running ? <Loader /> : t("simulate")}
         </Button>
 
-        <DeckExplorerButtons />
+        <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+          <Button style="gray" onClick={saveCurrentLoadout}>保存</Button>
+          <Button style="gray" onClick={loadSavedLoadout}>読込</Button>
+        </div>
+
         <div className={styles.url}>{simulatorUrl}</div>
 
         {topCombos.length > 0 && (
