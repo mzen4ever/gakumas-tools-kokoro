@@ -42,10 +42,10 @@ import { EntityTypes } from "@/utils/entities";
 import DeckExplorerSubTools from "@/components/DeckExplorer/DeckExplorerSubTools";
 import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 
-const DE_NUM_RUNS = 200;
+const DE_NUM_RUNS = 50;
 
 function generateItemCombos(currentItems, candidates) {
-  const fixed = currentItems.find((id) => id !== null); // 最初のnullでないアイテム
+  const fixed = currentItems.find((id) => id !== null);
   const slotCount = currentItems.filter((id) => id !== null).length;
 
   const usable = Array.from(
@@ -54,17 +54,19 @@ function generateItemCombos(currentItems, candidates) {
 
   const results = [];
 
-  function pick(current, start = 0) {
-    if (current.length === slotCount - 1) {
-      results.push([fixed, ...current]);
-      return;
-    }
-    for (let i = start; i < usable.length; i++) {
-      pick([...current, usable[i]], i + 1);
-    }
+  for (let count = 0; count <= Math.min(usable.length, slotCount - 1); count++) {
+    const pick = (current, start = 0) => {
+      if (current.length === count) {
+        results.push([fixed, ...current]);
+        return;
+      }
+      for (let i = start; i < usable.length; i++) {
+        pick([...current, usable[i]], i + 1);
+      }
+    };
+    pick([]);
   }
 
-  pick([]);
   return results;
 }
 
@@ -78,7 +80,7 @@ export default function DeckExplorer() {
     setSupportBonus,
     setParams,
     replacePItemId,
-    setLoadout, // ✅ 追加
+    setLoadout,
   } = useContext(LoadoutContext);
   const { idolId } = useContext(WorkspaceContext);
 
@@ -163,7 +165,7 @@ export default function DeckExplorer() {
 
     try {
       const saved = JSON.parse(data);
-      setLoadout(saved); // ✅ 一括で反映
+      setLoadout(saved);
       alert("デッキを復元しました。");
     } catch (err) {
       console.error("Load error:", err);
