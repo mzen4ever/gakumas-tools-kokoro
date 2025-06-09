@@ -42,7 +42,7 @@ import { EntityTypes } from "@/utils/entities";
 import DeckExplorerSubTools from "@/components/DeckExplorer/DeckExplorerSubTools";
 import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 
-const DE_NUM_RUNS = 50;
+const DE_NUM_RUNS = 200;
 
 function generateItemCombos(currentItems, candidates) {
   const fixed = currentItems.find((id) => id !== null);
