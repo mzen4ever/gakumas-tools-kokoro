@@ -55,14 +55,16 @@
   },
   "Calculator": {
     "scenario": "Scenario",
-    "hajime": "Hajime",
-    "nia": "N.I.A"
-  },
-  "ProduceRankCalculator": {
     "scenarios": {
       "hajime": "Hajime",
       "nia": "N.I.A"
     },
+    "calculator": "Calculator",
+    "calculators": {
+      "produce-rank": "Produce rank",
+      "lesson": "Lesson"
+    },
+    "difficulty": "Difficulty",
     "difficulties": {
       "regular": "Regular",
       "pro": "Pro",
@@ -74,8 +76,6 @@
       "3": "3rd",
       "4": "Other"
     },
-    "scenario": "Scenario",
-    "difficulty": "Difficulty",
     "parameterLimit": "Parameter limit",
     "finalExamPlacement": "Final exam placement",
     "parameter": "Parameter",
@@ -287,6 +287,7 @@
     "uneaseTurns": "Unease",
     "scoreBuff": "Score increase buff",
     "goodImpressionTurnsBuff": "Good impression increase buff",
+    "goodImpressionTurnsEffectBuff": "Good impression effect buff",
     "turn": "Turn",
     "cardDrawn": "Card drawn",
     "upgradedHand": "Upgraded all cards in hand",
