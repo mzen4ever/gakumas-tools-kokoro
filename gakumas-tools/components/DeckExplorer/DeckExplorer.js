@@ -254,7 +254,7 @@ export default function DeckExplorer() {
 
         {topCombos.length > 0 && (
           <div className={styles.results}>
-            <h4>上位5位組み合わせ</h4>
+            <h4>上位5つ組み合わせ</h4>
             <div className={styles.comboRow}>
               {topCombos.map((entry, idx) => (
                 <div key={idx} className={styles.comboGroup}>
