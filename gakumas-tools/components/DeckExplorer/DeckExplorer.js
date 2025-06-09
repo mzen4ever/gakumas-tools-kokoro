@@ -50,22 +50,26 @@ import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 const DE_NUM_RUNS = 50;
 
 function generateItemCombos(currentItems, candidates) {
-  const fixed = currentItems[0];
-  const mutable = currentItems.slice(1).filter((id) => id !== null);
-  const allUsableItems = Array.from(new Set([...mutable, ...candidates]));
-  if (allUsableItems.length < 2) return [];
+  const fixed = currentItems.find((id) => id !== null); // 最初のnullでないアイテム
+  const slotCount = currentItems.filter((id) => id !== null).length;
+
+  const usable = Array.from(
+    new Set([...currentItems.filter((id) => id !== fixed), ...candidates].filter((id) => id !== null))
+  );
+
   const results = [];
-  function permute(arr, combo = []) {
-    if (combo.length === 2) {
-      results.push([fixed, ...combo]);
+
+  function pick(current, start = 0) {
+    if (current.length === slotCount - 1) {
+      results.push([fixed, ...current]);
       return;
     }
-    for (let i = 0; i < arr.length; i++) {
-      if (combo.includes(arr[i])) continue;
-      permute(arr, [...combo, arr[i]]);
+    for (let i = start; i < usable.length; i++) {
+      pick([...current, usable[i]], i + 1);
     }
   }
-  permute(allUsableItems);
+
+  pick([]);
   return results;
 }
 
@@ -79,15 +83,13 @@ export default function DeckExplorer() {
     setSupportBonus,
     setParams,
     replacePItemId,
-    pushLoadoutHistory,
   } = useContext(LoadoutContext);
-  const { plan, idolId } = useContext(WorkspaceContext);
+  const { idolId } = useContext(WorkspaceContext);
 
   const [strategy, setStrategy] = useState("HeuristicStrategy");
   const [simulatorData, setSimulatorData] = useState(null);
   const [itemCandidates, setItemCandidates] = useState([null, null, null]);
   const [running, setRunning] = useState(false);
-  const [doneMessage, setDoneMessage] = useState("");
   const [topCombos, setTopCombos] = useState([]);
   const workersRef = useRef();
 
@@ -116,27 +118,17 @@ export default function DeckExplorer() {
     return () => workersRef.current?.forEach((worker) => worker.terminate());
   }, []);
 
-  useEffect(() => {
-    if (simulatorData) {
-      document.getElementById("simulator_result")?.scrollIntoView({
-        behavior: "smooth",
-      });
-    }
-  }, [simulatorData]);
-
   const setResult = useCallback(
     (result) => {
       const bucketedScores = bucketScores(result.scores);
       const medianScore = getMedianScore(result.scores);
       console.timeEnd("simulation");
-      console.log("All simulation scores:", result.scores);
       const average = (
         result.scores.reduce((sum, val) => sum + val, 0) / result.scores.length
       ).toFixed(2);
       console.log(`Average Score: ${average}`);
       setSimulatorData({ bucketedScores, medianScore, ...result });
       setRunning(false);
-      setDoneMessage("完了");
     },
     [setSimulatorData, setRunning]
   );
@@ -149,13 +141,13 @@ export default function DeckExplorer() {
 
   async function runSimulation() {
     setRunning(true);
-    setDoneMessage("");
     console.time("simulation");
 
     const combos = generateItemCombos(loadout.pItemIds, itemCandidates).slice(0, 20);
     const scored = [];
 
     for (const combo of combos) {
+      console.log("DEBUG combo:", combo);
       const newLoadout = { ...loadout, pItemIds: combo };
       const newConfig = new IdolStageConfig(
         new IdolConfig(newLoadout),
@@ -225,7 +217,7 @@ export default function DeckExplorer() {
           pItemIds={itemCandidates}
           replacePItemId={replaceItemCandidate}
           indications={[]}
-          size="medium"
+          size="small"
         />
 
         {loadout.skillCardIdGroups.map((skillCardIdGroup, i) => (
@@ -257,8 +249,6 @@ export default function DeckExplorer() {
           {running ? <Loader /> : t("simulate")}
         </Button>
 
-        
-
         <DeckExplorerButtons />
         <div className={styles.url}>{simulatorUrl}</div>
 
@@ -287,14 +277,6 @@ export default function DeckExplorer() {
           </div>
         )}
       </div>
-
-      {/* {simulatorData && (
-        <DeckExplorerResult data={simulatorData} plan={plan} idolId={idolId} />
-      )} */}
-
-      
-
-{/*       <KofiAd /> */}
     </div>
   );
 }
