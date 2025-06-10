@@ -42,7 +42,7 @@ import { EntityTypes } from "@/utils/entities";
 import DeckExplorerSubTools from "@/components/DeckExplorer/DeckExplorerSubTools";
 import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 
-const DE_NUM_RUNS = 400;
+const DE_NUM_RUNS = 200;
 
 function generateItemCombos(currentItems, candidates) {
   const fixed = currentItems.find((id) => id != null);  // null or undefined を排除
@@ -135,7 +135,16 @@ export default function DeckExplorer() {
     console.log("pItemIds:", loadout.pItemIds);
     console.log("candidates:", itemCandidates);
 
-    const combos = generateItemCombos(loadout.pItemIds, itemCandidates).slice(0, 20); //.slice(0, x) xは混み合わせ数、実質的な上限設定
+    const allCombos = generateItemCombos(loadout.pItemIds, itemCandidates);
+    console.log("Total generated combos:", allCombos.length);
+    let combos;
+    if (allCombos.length <= 64) {
+      combos = allCombos;
+    } else {
+      combos = allCombos.slice(0, 64);
+    }
+    console.log("Combos used for simulation:", combos.length);
+
     const scored = [];
 
     const numWorkers = workersRef.current?.length || 1;
