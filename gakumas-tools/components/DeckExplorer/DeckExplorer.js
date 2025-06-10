@@ -45,16 +45,21 @@ import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 const DE_NUM_RUNS = 200;
 
 function generateItemCombos(currentItems, candidates) {
-  const fixed = currentItems.find((id) => id !== null);
-  const slotCount = currentItems.filter((id) => id !== null).length;
+  const fixed = currentItems.find((id) => id != null);  // null or undefined を排除
+
+  const usedSlotCount = currentItems.filter((id) => id != null).length;
 
   const usable = Array.from(
-    new Set([...currentItems.filter((id) => id !== fixed), ...candidates].filter((id) => id !== null))
+    new Set(
+      [...currentItems.filter((id) => id != null && id !== fixed), ...candidates].filter(
+        (id) => id != null
+      )
+    )
   );
 
   const results = [];
 
-  for (let count = 0; count <= Math.min(usable.length, slotCount - 1); count++) {
+  for (let count = 0; count <= Math.min(usable.length, usedSlotCount - 1); count++) {
     const pick = (current, start = 0) => {
       if (current.length === count) {
         results.push([fixed, ...current]);
@@ -127,7 +132,10 @@ export default function DeckExplorer() {
     setRunning(true);
     console.time("simulation");
 
-    const combos = generateItemCombos(loadout.pItemIds, itemCandidates).slice(0, 20);
+    console.log("pItemIds:", loadout.pItemIds);
+    console.log("candidates:", itemCandidates);
+
+    const combos = generateItemCombos(loadout.pItemIds, itemCandidates);
     const scored = [];
 
     for (const combo of combos) {
@@ -141,6 +149,10 @@ export default function DeckExplorer() {
       scored.push({ result, combo, avg });
       await new Promise((r) => setTimeout(r, 0));
     }
+
+    scored.forEach((entry, i) => {
+      console.log(`combo #${i + 1}:`, entry.combo, `length: ${entry.combo.length}`, `score: ${entry.avg}`);
+    });
 
     scored.sort((a, b) => b.avg - a.avg);
     setSimulatorData(scored[0].result);
