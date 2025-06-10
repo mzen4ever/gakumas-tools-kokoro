@@ -122,17 +122,20 @@
   margin-top: 12px;
 }
 
-.comboGroup {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0px;
-}
-
 .comboIcons {
   display: flex;
-  gap: 2px; /* ← さらに詰める */
-  min-width: 240px; /* ← 固定幅をなくしてスコアが隣に来やすくする */
+  gap: 4px;
+  min-width: 360px;
+
+  @media (max-width: 600px) {
+    min-width: unset;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+.comboGroup {
+  flex-wrap: wrap; /* スマホでアイコン＋スコアを縦並びにするのも可 */
 }
 
 .comboScore {
