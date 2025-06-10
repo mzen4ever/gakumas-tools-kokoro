@@ -125,13 +125,7 @@
 .comboIcons {
   display: flex;
   gap: 4px;
-  min-width: 360px;
-
-  @media (max-width: 600px) {
-    min-width: unset;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+  min-width: 240px;
 }
 
 .comboGroup {
