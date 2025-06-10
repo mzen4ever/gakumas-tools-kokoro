@@ -42,7 +42,7 @@ import { EntityTypes } from "@/utils/entities";
 import DeckExplorerSubTools from "@/components/DeckExplorer/DeckExplorerSubTools";
 import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 
-const DE_NUM_RUNS = 200;
+const DE_NUM_RUNS = 400;
 
 function generateItemCombos(currentItems, candidates) {
   const fixed = currentItems.find((id) => id != null);  // null or undefined を排除
@@ -135,8 +135,11 @@ export default function DeckExplorer() {
     console.log("pItemIds:", loadout.pItemIds);
     console.log("candidates:", itemCandidates);
 
-    const combos = generateItemCombos(loadout.pItemIds, itemCandidates);
+    const combos = generateItemCombos(loadout.pItemIds, itemCandidates).slice(0, 20); //.slice(0, x) xは混み合わせ数、実質的な上限設定
     const scored = [];
+
+    const numWorkers = workersRef.current?.length || 1;
+    const runsPerWorker = Math.round(DE_NUM_RUNS / numWorkers);
 
     for (const combo of combos) {
       const newLoadout = { ...loadout, pItemIds: combo };
@@ -144,14 +147,40 @@ export default function DeckExplorer() {
         new IdolConfig(newLoadout),
         new StageConfig(stage)
       );
-      const result = simulate(newConfig, strategy, DE_NUM_RUNS);
-      const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
-      scored.push({ result, combo, avg });
+
+      if (numWorkers > 1) {
+        const promises = workersRef.current.map(
+          (worker) =>
+            new Promise((resolve) => {
+              worker.onmessage = (e) => resolve(e.data);
+              worker.postMessage({
+                idolStageConfig: newConfig,
+                strategyName: strategy,
+                numRuns: runsPerWorker,
+              });
+            })
+        );
+
+        const results = await Promise.all(promises);
+        const scores = results.flatMap((res) => res.scores);
+        const avg = scores.reduce((sum, v) => sum + v, 0) / scores.length;
+        scored.push({ result: results[0], combo, avg });
+      } else {
+        const result = simulate(newConfig, strategy, DE_NUM_RUNS);
+        const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+        scored.push({ result, combo, avg });
+      }
+
       await new Promise((r) => setTimeout(r, 0));
     }
 
     scored.forEach((entry, i) => {
-      console.log(`combo #${i + 1}:`, entry.combo, `length: ${entry.combo.length}`, `score: ${entry.avg}`);
+      console.log(
+        `combo #${i + 1}:`,
+        entry.combo,
+        `length: ${entry.combo.length}`,
+        `score: ${entry.avg}`
+      );
     });
 
     scored.sort((a, b) => b.avg - a.avg);
