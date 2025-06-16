@@ -42,13 +42,11 @@ import { EntityTypes } from "@/utils/entities";
 import DeckExplorerSubTools from "@/components/DeckExplorer/DeckExplorerSubTools";
 import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 
-const DE_NUM_RUNS = 200;
+const DEFAULT_NUM_RUNS = 200;
 
 function generateItemCombos(currentItems, candidates) {
   const fixed = currentItems.find((id) => id != null);  // null or undefined を排除
-
   const usedSlotCount = currentItems.filter((id) => id != null).length;
-
   const usable = Array.from(
     new Set(
       [...currentItems.filter((id) => id != null && id !== fixed), ...candidates].filter(
@@ -56,9 +54,7 @@ function generateItemCombos(currentItems, candidates) {
       )
     )
   );
-
   const results = [];
-
   for (let count = 0; count <= Math.min(usable.length, usedSlotCount - 1); count++) {
     const pick = (current, start = 0) => {
       if (current.length === count) {
@@ -71,13 +67,11 @@ function generateItemCombos(currentItems, candidates) {
     };
     pick([]);
   }
-
   return results;
 }
 
 export default function DeckExplorer() {
   const t = useTranslations("Simulator");
-
   const {
     stage,
     loadout,
@@ -95,6 +89,7 @@ export default function DeckExplorer() {
   const [running, setRunning] = useState(false);
   const [topCombos, setTopCombos] = useState([]);
   const [savedLoadout, setSavedLoadout] = useState(null);
+  const [numRuns, setNumRuns] = useState(DEFAULT_NUM_RUNS);
   const workersRef = useRef();
 
   const config = useMemo(() => {
@@ -132,23 +127,11 @@ export default function DeckExplorer() {
     setRunning(true);
     console.time("simulation");
 
-    console.log("pItemIds:", loadout.pItemIds);
-    console.log("candidates:", itemCandidates);
-
     const allCombos = generateItemCombos(loadout.pItemIds, itemCandidates);
-    console.log("Total generated combos:", allCombos.length);
-    let combos;
-    if (allCombos.length <= 64) {
-      combos = allCombos;
-    } else {
-      combos = allCombos.slice(0, 64);
-    }
-    console.log("Combos used for simulation:", combos.length);
-
+    const combos = allCombos.length <= 64 ? allCombos : allCombos.slice(0, 64);
     const scored = [];
-
     const numWorkers = workersRef.current?.length || 1;
-    const runsPerWorker = Math.round(DE_NUM_RUNS / numWorkers);
+    const runsPerWorker = Math.round(numRuns / numWorkers);
 
     for (const combo of combos) {
       const newLoadout = { ...loadout, pItemIds: combo };
@@ -175,22 +158,12 @@ export default function DeckExplorer() {
         const avg = scores.reduce((sum, v) => sum + v, 0) / scores.length;
         scored.push({ result: results[0], combo, avg });
       } else {
-        const result = simulate(newConfig, strategy, DE_NUM_RUNS);
+        const result = simulate(newConfig, strategy, numRuns);
         const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
         scored.push({ result, combo, avg });
       }
-
       await new Promise((r) => setTimeout(r, 0));
     }
-
-    scored.forEach((entry, i) => {
-      console.log(
-        `combo #${i + 1}:`,
-        entry.combo,
-        `length: ${entry.combo.length}`,
-        `score: ${entry.avg}`
-      );
-    });
 
     scored.sort((a, b) => b.avg - a.avg);
     setSimulatorData(scored[0].result);
@@ -206,7 +179,7 @@ export default function DeckExplorer() {
         skillCardIdGroups: loadout.skillCardIdGroups || [],
         customizationGroups: loadout.customizationGroups || [],
       },
-      itemCandidates, // 分離して保存
+      itemCandidates,
     };
     localStorage.setItem("deckExplorerSavedLoadout", JSON.stringify(saved));
     alert("ローカルに保存しました。");
@@ -218,9 +191,9 @@ export default function DeckExplorer() {
 
     try {
       const saved = JSON.parse(data);
-      setLoadout(saved.loadout); // 明示的に loadout 部分だけ
+      setLoadout(saved.loadout);
       if (saved.itemCandidates) {
-        setItemCandidates(saved.itemCandidates); // 候補も復元
+        setItemCandidates(saved.itemCandidates);
       }
       alert("デッキを復元しました。");
     } catch (err) {
@@ -247,6 +220,17 @@ export default function DeckExplorer() {
             />
           </div>
         )}
+
+        <div className={styles.supportBonusInput}>
+          <label>試行回数（最大2000）</label>
+          <Input
+            type="number"
+            value={numRuns}
+            onChange={(value) =>
+              setNumRuns(Math.min(2000, Math.max(1, parseInt(value) || 1)))
+            }
+          />
+        </div>
 
         <div className={styles.params}>
           <ParametersInput
