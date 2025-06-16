@@ -253,14 +253,18 @@ export default function DeckExplorer() {
         <StageSelect />
 
         <div className={styles.supportBonusInput}>
-          <label>試行回数（最大2000）</label>
-          <Input
-            type="number"
-            value={numRuns}
-            onChange={(value) =>
-              setNumRuns(Math.min(2000, Math.max(1, parseInt(value) || 1)))
-            }
-          />
+          <label>試行回数</label>
+            <select
+              value={numRuns}
+              onChange={(e) => setNumRuns(Number(e.target.value))}
+              style={{ padding: "4px" }}
+            >
+              {[20, 50, 100, 200, 400, 1000, 2000].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
         </div>
 
         {stage.type === "event" ? (
