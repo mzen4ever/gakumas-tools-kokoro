@@ -39,6 +39,10 @@
     "rehearsal": {
       "title": "Rehearsal Parser",
       "description": "Parse scores from rehearsal screenshots"
+    },
+    "deckexplorer": {
+      "title": "アイテム探索",
+      "description": "高スコアが出るアイテム組み合わせを自動探索する"
     }
   },
   "NavbarMenu": {

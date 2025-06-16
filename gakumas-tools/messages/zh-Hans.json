@@ -39,6 +39,10 @@
     "rehearsal": {
       "title": "排练解析器",
       "description": "从排练截图中解析分数"
+    },
+    "deckexplorer": {
+      "title": "アイテム探索",
+      "description": "高スコアが出るアイテム組み合わせを自動探索する"
     }
   },
   "NavbarMenu": {

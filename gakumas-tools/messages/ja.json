@@ -41,8 +41,8 @@
       "description": "リハーサル画面のスクショからスコアを読み取る"
     },
     "deckexplorer": {
-      "title": "最適カードデッキ探索",
-      "description": "ステージに合わせて高得点が出るカード組み合わせを自動探索する"
+      "title": "アイテム探索",
+      "description": "高スコアが出るアイテム組み合わせを自動探索する"
     }
   },
   "NavbarMenu": {

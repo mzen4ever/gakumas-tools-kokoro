@@ -14,7 +14,7 @@ function Navbar() {
   return (
     <nav className={styles.navbar}>
       <Link href="/">
-        <h1>Gakumas Tools</h1>
+        <h1>Gakumas Tools Kokoro</h1>
       </Link>
 
       <div className={styles.links}>

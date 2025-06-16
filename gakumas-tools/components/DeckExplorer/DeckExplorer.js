@@ -90,6 +90,7 @@ export default function DeckExplorer() {
   const [topCombos, setTopCombos] = useState([]);
   const [savedLoadout, setSavedLoadout] = useState(null);
   const [numRuns, setNumRuns] = useState(DEFAULT_NUM_RUNS);
+  const [sharedUrlInput, setSharedUrlInput] = useState("");
   const workersRef = useRef();
 
   const config = useMemo(() => {
@@ -121,6 +122,41 @@ export default function DeckExplorer() {
     const updated = [...itemCandidates];
     updated[index] = id;
     setItemCandidates(updated);
+  }
+
+  function parseSimulatorUrl(url) {
+    try {
+      const parsedUrl = new URL(url);
+      const params = parsedUrl.searchParams;
+
+      const stageId = parseInt(params.get("stage"));
+      const supportBonus = parseFloat(params.get("support_bonus"));
+      const rawParams = params.get("params")?.split("-").map(Number);
+      const rawItems = params.get("items")?.split("-").map(Number);
+      const rawCards = params.get("cards")?.split("_").map(group =>
+        group.split("-").map(Number)
+      );
+      const rawCustomizations = params.get("customizations")?.split("_").map(group =>
+        group.split("-").map(entry => {
+          const [id, count] = entry.split("x").map(Number);
+          return { id, count };
+        })
+      );
+
+      const newLoadout = { ...loadout };
+
+      if (!isNaN(stageId)) newLoadout.stageId = stageId;
+      if (!isNaN(supportBonus)) newLoadout.supportBonus = supportBonus;
+      if (rawParams) newLoadout.params = rawParams;
+      if (rawItems) newLoadout.pItemIds = rawItems;
+      if (rawCards) newLoadout.skillCardIdGroups = rawCards;
+      if (rawCustomizations) newLoadout.customizationGroups = rawCustomizations;
+
+      setLoadout(newLoadout);
+      alert("URLから設定を読み込みました");
+    } catch (e) {
+      alert("URLの読み込みに失敗しました");
+    }
   }
 
   async function runSimulation() {
@@ -299,8 +335,28 @@ export default function DeckExplorer() {
         </Button>
 
         <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-          <Button style="gray" onClick={saveCurrentLoadout}>保存</Button>
-          <Button style="gray" onClick={loadSavedLoadout}>読込</Button>
+          <Button style="gray" onClick={saveCurrentLoadout}>ローカル保存</Button>
+          <Button style="gray" onClick={loadSavedLoadout}>ローカル読込</Button>
+          <Button
+            style="gray"
+            onClick={() => {
+              navigator.clipboard.writeText(simulatorUrl);
+              alert("URLをコピーしました\n" + simulatorUrl);
+            }}
+          >
+            gktoolsのURLをコピー
+          </Button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "12px" }}>
+          <input
+            type="text"
+            placeholder="gktoolsのURLを入力"
+            value={sharedUrlInput}
+            onChange={(e) => setSharedUrlInput(e.target.value)}
+            style={{ width: "100%", padding: "4px" }}
+          />
+          <Button style="gray" onClick={() => parseSimulatorUrl(sharedUrlInput)}>URL読込</Button>
         </div>
 
         <div className={styles.url}>{simulatorUrl}</div>
