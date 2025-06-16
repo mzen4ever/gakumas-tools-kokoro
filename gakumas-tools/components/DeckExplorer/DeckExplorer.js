@@ -201,9 +201,12 @@ export default function DeckExplorer() {
 
   function saveCurrentLoadout() {
     const saved = {
-      ...loadout,
-      skillCardIdGroups: loadout.skillCardIdGroups || [],
-      customizationGroups: loadout.customizationGroups || [],
+      loadout: {
+        ...loadout,
+        skillCardIdGroups: loadout.skillCardIdGroups || [],
+        customizationGroups: loadout.customizationGroups || [],
+      },
+      itemCandidates, // 分離して保存
     };
     localStorage.setItem("deckExplorerSavedLoadout", JSON.stringify(saved));
     alert("ローカルに保存しました。");
@@ -215,7 +218,10 @@ export default function DeckExplorer() {
 
     try {
       const saved = JSON.parse(data);
-      setLoadout(saved);
+      setLoadout(saved.loadout); // 明示的に loadout 部分だけ
+      if (saved.itemCandidates) {
+        setItemCandidates(saved.itemCandidates); // 候補も復元
+      }
       alert("デッキを復元しました。");
     } catch (err) {
       console.error("Load error:", err);
@@ -322,7 +328,7 @@ export default function DeckExplorer() {
               {topCombos.map((entry, idx) => (
                 <div key={idx} className={styles.comboGroup}>
                   <div className={styles.comboIcons}>
-                    {entry.combo.map((id, i) => (
+                    {entry.combo.slice(1).map((id, i) => (
                       <EntityIcon
                         key={i}
                         type={EntityTypes.P_ITEM}
