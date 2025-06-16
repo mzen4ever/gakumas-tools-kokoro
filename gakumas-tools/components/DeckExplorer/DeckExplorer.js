@@ -146,10 +146,25 @@ export default function DeckExplorer() {
       if (rawCards) newLoadout.skillCardIdGroups = rawCards;
 
       setLoadout(newLoadout);
-      alert("URLから設定を読み込みました（カスタマイズ除く）");
+      alert("設定を読み込みました");
     } catch (e) {
       console.error("URL読込エラー:", e);
       alert("URLの読み込みに失敗しました");
+    }
+  }
+
+  async function readFromClipboardAndParse() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text.includes("gktools.ris.moe/simulator")) {
+        alert("gktools のURLではありません。");
+        return;
+      }
+
+      parseSimulatorUrl(text);  // 既存関数（カスタマイズ除く）
+    } catch (err) {
+      console.error("Clipboard error:", err);
+      alert("クリップボードの読み込みに失敗しました。");
     }
   }
 
@@ -343,16 +358,10 @@ export default function DeckExplorer() {
           </Button>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginTop: "12px" }}>
-          <input
-            type="text"
-            placeholder="gktoolsのURLを入力"
-            value={sharedUrlInput}
-            onChange={(e) => setSharedUrlInput(e.target.value)}
-            style={{ width: "100%", padding: "4px" }}
-          />
-          <Button style="gray" onClick={() => parseSimulatorUrl(sharedUrlInput)}>URL読込</Button>
-        </div>
+        <Button style="gray" onClick={readFromClipboardAndParse}>
+          クリップボードからgktoolsのURL読込（カスタマイズを除く）
+        </Button>
+
 
         <div className={styles.url}>{simulatorUrl}</div>
 
