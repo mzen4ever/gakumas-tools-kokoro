@@ -136,12 +136,6 @@ export default function DeckExplorer() {
       const rawCards = params.get("cards")?.split("_").map(group =>
         group.split("-").map(Number)
       );
-      const rawCustomizations = params.get("customizations")?.split("_").map(group =>
-        group.split("-").map(entry => {
-          const [id, count] = entry.split("x").map(Number);
-          return { id, count };
-        })
-      );
 
       const newLoadout = { ...loadout };
 
@@ -150,11 +144,11 @@ export default function DeckExplorer() {
       if (rawParams) newLoadout.params = rawParams;
       if (rawItems) newLoadout.pItemIds = rawItems;
       if (rawCards) newLoadout.skillCardIdGroups = rawCards;
-      if (rawCustomizations) newLoadout.customizationGroups = rawCustomizations;
 
       setLoadout(newLoadout);
-      alert("URLから設定を読み込みました");
+      alert("URLから設定を読み込みました（カスタマイズ除く）");
     } catch (e) {
+      console.error("URL読込エラー:", e);
       alert("URLの読み込みに失敗しました");
     }
   }
@@ -342,7 +336,7 @@ export default function DeckExplorer() {
             style="gray"
             onClick={() => {
               navigator.clipboard.writeText(simulatorUrl);
-              alert("URLをコピーしました\n" + simulatorUrl);
+              alert("URLをコピーしました");
             }}
           >
             gktoolsのURLをコピー
