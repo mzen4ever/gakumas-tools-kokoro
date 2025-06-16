@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "学园偶像大师工具站",
-    "description": "学园偶像大师工具站是一个为初星学园的制作人提供实用工具的工具站。在这里可以计算等级所需的考试分数、查看道具和技能卡的信息、整理记忆卡、规划并模拟竞技场阵容等。成为最优秀的制作人，帮助你的偶像闪耀吧！"
+    "title": "Gakumas Tools Kokoro - 学マスツール こころ",
+    "introduction": "「Gakumas Tools Kokoro（学マスツール こころ）」は、surisuririsu氏が公開している「Gakumas Tools（学マスツール）」に一部機能を追加したFork版です。"
   },
   "tools": {
     "home": {
@@ -54,8 +54,8 @@
     "signOut": "登出"
   },
   "Welcome": {
-    "title": "学园偶像大师工具站",
-    "introduction": "一个为学园偶像大师而生的工具站。本站有计算目标评级所需得分、回忆卡生成概率计算、查看P道具与技能卡信息、导入和搜索回忆卡、竞技场编成与打分模拟等功能"
+    "title": "Gakumas Tools Kokoro - 学マスツール こころ",
+    "introduction": "「Gakumas Tools Kokoro（学マスツール こころ）」は、surisuririsu氏が公開している「Gakumas Tools（学マスツール）」に一部機能を追加したFork版です。"
   },
   "Calculator": {
     "scenario": "剧本",

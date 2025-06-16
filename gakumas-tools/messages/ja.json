@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "Gakumas Tools - 学マスツール",
-    "description": "「Gakumas Tools（学マスツール）」は、初星学園プロデューサー科の生徒のためのツール集です。プロデュース評価に必要な最終試験スコアの計算、メモリー生成確率の計算、コンテスト編成のシミュレーションなど、便利な機能が揃っています。アイドルたちを輝かせましょう！"
+    "title": "Gakumas Tools Kokoro - 学マスツール こころ",
+    "description": "「Gakumas Tools Kokoro（学マスツール こころ）」は、surisuririsu氏が公開している「Gakumas Tools（学マスツール）」に一部機能を追加したFork版です。"
   },
   "tools": {
     "home": {
@@ -54,8 +54,8 @@
     "signOut": "ログアウト"
   },
   "Welcome": {
-    "title": "Gakumas Tools - 学マスツール",
-    "introduction": "プロデュース評価に必要な最終試験スコアの計算、メモリー生成確率の計算、コンテスト編成のシミュレーションなど、便利な機能が揃っています。"
+    "title": "Gakumas Tools Kokoro - 学マスツール こころ",
+    "introduction": "「Gakumas Tools Kokoro（学マスツール こころ）」は、surisuririsu氏が公開している「Gakumas Tools（学マスツール）」に一部機能を追加したFork版です。"
   },
   "Calculator": {
     "scenario": "シナリオ",

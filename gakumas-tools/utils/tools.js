@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa6";
 
 export const TOOLS = {
-  produceRankCalculator: {
+/*   produceRankCalculator: {
     icon: <FaCalculator />,
     path: "/calculator",
     pinnable: true,
@@ -28,17 +28,17 @@ export const TOOLS = {
     icon: <FaFilm />,
     path: "/memories",
     pinnable: true,
-  },
+  }, */
   simulator: {
     icon: <FaTrophy />,
     path: "/simulator",
     pinnable: true,
   },
-  rehearsal: {
+/*   rehearsal: {
     icon: <FaChartSimple />,
     path: "/rehearsal",
     pinnable: true,
-  },
+  }, */
   deckexplorer: {
     icon: "そろばんあじふらい",
     path: "/deckexplorer"

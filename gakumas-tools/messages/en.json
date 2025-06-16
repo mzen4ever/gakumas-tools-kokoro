@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "Gakumas Tools",
-    "description": "Gakumas Tools is a collection of useful tools for producers at Hatsuboshi Gakuen. Calculate required final exam scores for produce ranks, view p-item and skill card information, organize memories, plan and simulate contest loadouts and more. Be the best producer and help your idols shine!"
+    "title": "Gakumas Tools Kokoro - 学マスツール こころ",
+    "introduction": "「Gakumas Tools Kokoro（学マスツール こころ）」は、surisuririsu氏が公開している「Gakumas Tools（学マスツール）」に一部機能を追加したFork版です。"
   },
   "tools": {
     "home": {
@@ -54,8 +54,8 @@
     "signOut": "Sign out"
   },
   "Welcome": {
-    "title": "Gakumas Tools",
-    "introduction": "Tools for playing Gakuen Idolmaster. Calculate required final exam scores for produce ranks, view p-item and skill card information, import and search memories, simulate contest loadouts and more!"
+    "title": "Gakumas Tools Kokoro - 学マスツール こころ",
+    "introduction": "「Gakumas Tools Kokoro（学マスツール こころ）」は、surisuririsu氏が公開している「Gakumas Tools（学マスツール）」に一部機能を追加したFork版です。"
   },
   "Calculator": {
     "scenario": "Scenario",

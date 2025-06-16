@@ -242,6 +242,18 @@ export default function DeckExplorer() {
     <div className={styles.loadoutEditor}>
       <div className={styles.configurator}>
         <StageSelect />
+
+        <div className={styles.supportBonusInput}>
+          <label>試行回数（最大2000）</label>
+          <Input
+            type="number"
+            value={numRuns}
+            onChange={(value) =>
+              setNumRuns(Math.min(2000, Math.max(1, parseInt(value) || 1)))
+            }
+          />
+        </div>
+
         {stage.type === "event" ? (
           t("enterPercents")
         ) : (
@@ -256,17 +268,6 @@ export default function DeckExplorer() {
             />
           </div>
         )}
-
-        <div className={styles.supportBonusInput}>
-          <label>試行回数（最大2000）</label>
-          <Input
-            type="number"
-            value={numRuns}
-            onChange={(value) =>
-              setNumRuns(Math.min(2000, Math.max(1, parseInt(value) || 1)))
-            }
-          />
-        </div>
 
         <div className={styles.params}>
           <ParametersInput
