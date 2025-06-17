@@ -348,6 +348,17 @@ export default function DeckExplorer() {
           {running ? <Loader /> : t("simulate")}
         </Button>
 
+        <div style={{ textAlign: "right", marginTop: "4px" }}>
+          <a
+            href="https://www.fanbox.cc/@kokorohappy"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: "12px", color: "#888", textDecoration: "none" }}
+          >
+            FANBOXで労わる ☕
+          </a>
+        </div>
+
         <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
           <Button style="gray" onClick={saveCurrentLoadout}>ローカル保存</Button>
           <Button style="gray" onClick={loadSavedLoadout}>ローカル読込</Button>
