@@ -50,3 +50,5 @@ jobs:
           title: '❗ Merge conflict detected with upstream/master'
           content-filepath: .github/conflict_message.md
           labels: 'conflict'
+          token: ${{ secrets.PAT_FOR_ISSUES }}
+
