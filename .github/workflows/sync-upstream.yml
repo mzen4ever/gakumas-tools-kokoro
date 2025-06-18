@@ -3,7 +3,7 @@ name: Sync with upstream
 on:
   workflow_dispatch:
   schedule:
-    - cron: '30 * * * *'
+    - cron: '30 * * * *' # ← JSTで9:30, 10:30, ...に相当
   repository_dispatch:
     types: [upstream_updated]
 
