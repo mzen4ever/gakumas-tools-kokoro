@@ -1,0 +1,52 @@
+name: Sync with upstream
+
+on:
+  workflow_dispatch:        # 手動実行
+  schedule:
+    - cron: '0 * * * *'     # 毎時チェック（必要なければ削除OK）
+  repository_dispatch:
+    types: [upstream_updated]  # 外部から通知を受けたとき
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repo
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream repo
+        run: git remote add upstream https://github.com/surisuririsu/gakumas-tools.git
+
+      - name: Fetch upstream changes
+        run: git fetch upstream
+
+      - name: Merge upstream/master into local master
+        run: |
+          git checkout master
+          git merge upstream/master || echo "CONFLICT" > conflict.txt
+
+      - name: Check for conflicts
+        id: conflict-check
+        run: |
+          if [ -f conflict.txt ]; then
+            echo "conflict=true" >> $GITHUB_OUTPUT
+          else
+            echo "conflict=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push if merge successful
+        if: steps.conflict-check.outputs.conflict == 'false'
+        run: git push origin master
+
+      - name: Notify if conflict occurred (create issue)
+        if: steps.conflict-check.outputs.conflict == 'true'
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: '❗ Merge conflict detected with upstream/master'
+          content-filepath: .github/conflict_message.md
+          labels: 'conflict'
