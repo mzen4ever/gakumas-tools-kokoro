@@ -88,14 +88,6 @@ export default function Simulator() {
     return () => workersRef.current?.forEach((worker) => worker.terminate());
   }, []);
 
-  useEffect(() => {
-    if (simulatorData) {
-      document.getElementById("simulator_result").scrollIntoView({
-        behavior: "smooth",
-      });
-    }
-  }, [simulatorData]);
-
   const setResult = useCallback(
     (result) => {
       const bucketedScores = bucketScores(result.scores);
@@ -155,10 +147,10 @@ export default function Simulator() {
   return (
     <div id="simulator_loadout" className={styles.loadoutEditor}>
       <div className={styles.configurator}>
-        <div>
+        {/* <div>
           ※ Season 26 preview is based only on the announced p-items and
           criteria. Turn types are not yet known.
-        </div>
+        </div> */}
         <div>※ Score multiplier is inaccurate for parameters above 2400.</div>
         <StageSelect />
         {stage.type == "event" ? (
@@ -251,7 +243,7 @@ export default function Simulator() {
             href="https://github.com/surisuririsu/gakumas-tools/blob/master/gakumas-tools/simulator/CHANGELOG.md"
             target="_blank"
           >
-            {t("lastUpdated")}: 2025-06-17
+            {t("lastUpdated")}: 2025-06-19
           </a>
         </div>
         {!simulatorData && (
