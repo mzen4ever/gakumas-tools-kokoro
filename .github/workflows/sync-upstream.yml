@@ -1,11 +1,11 @@
 name: Sync with upstream
 
 on:
-  workflow_dispatch:        # 手動実行
+  workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'     # 毎時チェック（必要なければ削除OK）
+    - cron: '0 * * * *'
   repository_dispatch:
-    types: [upstream_updated]  # 外部から通知を受けたとき
+    types: [upstream_updated]
 
 jobs:
   sync:
