@@ -14,7 +14,7 @@ jobs:
       - name: Checkout your repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # ← これが重要
 
       - name: Set up Git
         run: |
@@ -30,7 +30,7 @@ jobs:
       - name: Merge upstream/master into local master
         run: |
           git checkout master
-          git merge upstream/master || echo "CONFLICT" > conflict.txt
+          git merge upstream/master --allow-unrelated-histories || echo "CONFLICT" > conflict.txt
 
       - name: Check for conflicts
         id: conflict-check
@@ -45,6 +45,10 @@ jobs:
         if: steps.conflict-check.outputs.conflict == 'false'
         run: git push origin master
 
+      - name: Check conflict_message.md exists
+        if: steps.conflict-check.outputs.conflict == 'true'
+        run: ls -l .github/
+
       - name: Notify if conflict occurred (create issue)
         if: steps.conflict-check.outputs.conflict == 'true'
         uses: peter-evans/create-issue-from-file@v4
@@ -53,4 +57,3 @@ jobs:
           content-filepath: .github/conflict_message.md
           labels: 'conflict'
           token: ${{ secrets.PAT_FOR_ISSUES }}
-
