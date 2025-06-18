@@ -45,28 +45,38 @@ import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 const DEFAULT_NUM_RUNS = 200;
 
 function generateItemCombos(currentItems, candidates) {
-  const fixed = currentItems.find((id) => id != null);  // null or undefined を排除
-  const usedSlotCount = currentItems.filter((id) => id != null).length;
+  const usedItems = currentItems.filter((id) => id != null && id !== 0); // ← 修正！
+  if (usedItems.length === 0) return [];
+
+  const fixed = usedItems[0];
+  const variableSlotCount = usedItems.length - 1;
+
   const usable = Array.from(
-    new Set(
-      [...currentItems.filter((id) => id != null && id !== fixed), ...candidates].filter(
-        (id) => id != null
-      )
-    )
+    new Set([...usedItems.slice(1), ...candidates].filter((id) => id != null && id !== 0 && id !== fixed))
   );
+
   const results = [];
-  for (let count = 0; count <= Math.min(usable.length, usedSlotCount - 1); count++) {
-    const pick = (current, start = 0) => {
-      if (current.length === count) {
-        results.push([fixed, ...current]);
-        return;
-      }
-      for (let i = start; i < usable.length; i++) {
-        pick([...current, usable[i]], i + 1);
-      }
-    };
-    pick([]);
-  }
+
+  const pick = (current, start = 0) => {
+    if (current.length === variableSlotCount) {
+      const combo = [fixed, ...current];
+      results.push(combo);
+      console.log("生成された組み合わせ:", combo);
+      return;
+    }
+    for (let i = start; i < usable.length; i++) {
+      pick([...current, usable[i]], i + 1);
+    }
+  };
+
+  console.log("🧪 generateItemCombos デバッグ");
+  console.log("  currentItems:", currentItems);
+  console.log("  usedItems:", usedItems);
+  console.log("  fixed:", fixed);
+  console.log("  variableSlotCount:", variableSlotCount);
+  console.log("  usable (候補):", usable);
+
+  pick([]);
   return results;
 }
 
@@ -173,6 +183,13 @@ export default function DeckExplorer() {
     console.time("simulation");
 
     const allCombos = generateItemCombos(loadout.pItemIds, itemCandidates);
+
+    // ✅ デバッグログ
+    console.log("📊 生成されたコンボ総数:", allCombos.length);
+    allCombos.forEach((combo, i) => {
+      console.log(`[${i}] combo.length = ${combo.length}:`, combo);
+    });
+
     const combos = allCombos.length <= 64 ? allCombos : allCombos.slice(0, 64);
     const scored = [];
     const numWorkers = workersRef.current?.length || 1;
@@ -207,11 +224,12 @@ export default function DeckExplorer() {
         const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
         scored.push({ result, combo, avg });
       }
+
       await new Promise((r) => setTimeout(r, 0));
     }
 
     scored.sort((a, b) => b.avg - a.avg);
-    setSimulatorData(scored[0].result);
+    setSimulatorData(scored[0]?.result || null);
     setTopCombos(scored.slice(0, 5));
     setRunning(false);
     console.timeEnd("simulation");
