@@ -328,6 +328,7 @@
   "Rehearsal": {
     "addScreenshots": "リハーサル結果画面のスクリーンショットからスコアを読み取ります。",
     "accuracyNotGuaranteed": "精度は保証できません。スクリーンショットと比較して、結果を確認することをお勧めします。",
+<<<<<<< HEAD
     "stage": "ステージ{n}"
   },
   "DeckExplorerButtons": {
@@ -339,5 +340,9 @@
     "costRanges": "コスト範囲",
     "history": "履歴",
     "defaultCards": "基本カード"
+=======
+    "stage": "ステージ{n}",
+    "score": "スコア"
+>>>>>>> upstream/master
   }
 }
