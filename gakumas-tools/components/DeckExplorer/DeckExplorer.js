@@ -22,6 +22,7 @@ import Loader from "@/components/Loader";
 import LoadoutSkillCardGroup from "@/components/LoadoutSkillCardGroup";
 import ParametersInput from "@/components/ParametersInput";
 import StagePItems from "@/components/StagePItems";
+import StageSkillCards from "@/components/StageSkillCards";
 import StageSelect from "@/components/StageSelect";
 import EntityIcon from "@/components/EntityIcon";
 
@@ -91,6 +92,8 @@ export default function DeckExplorer() {
   const [strategy, setStrategy] = useState("HeuristicStrategy");
   const [simulatorData, setSimulatorData] = useState(null);
   const [itemCandidates, setItemCandidates] = useState([null, null, null]);
+  const [cardCandidates, setCardCandidates] = useState([null]);
+  const [cardCustomizationsList, setCardCustomizationsList] = useState([]);
   const [running, setRunning] = useState(false);
   const [topCombos, setTopCombos] = useState([]);
   const [savedLoadout, setSavedLoadout] = useState(null);
@@ -137,6 +140,20 @@ export default function DeckExplorer() {
     const updated = [...itemCandidates];
     updated[index] = id;
     setItemCandidates(updated);
+  }
+
+  function replaceCardSwapCandidate(index, cardId) {
+    const updated = [...cardCandidates];
+    updated[index] = cardId;
+    setCardCandidates(updated);
+  }
+
+  function replaceCardCustomizations(index, customizations) {
+    setCardCustomizationsList((prev) => {
+      const updated = [...prev];
+      updated[index] = customizations;
+      return updated;
+    });
   }
 
   async function readFromClipboardAndParse() {
@@ -320,6 +337,16 @@ export default function DeckExplorer() {
           replacePItemId={replaceItemCandidate}
           indications={[]}
           size="small"
+        />
+
+        <h4>カード候補</h4>
+        <StageSkillCards
+          skillCardIds={cardCandidates}
+          customizations={cardCustomizationsList}
+          replaceSkillCardId={replaceCardSwapCandidate}
+          replaceCustomizations={replaceCardCustomizations}
+          size="small"
+          groupIndex={0}
         />
 
         {loadout.skillCardIdGroups.map((skillCardIdGroup, i) => (
