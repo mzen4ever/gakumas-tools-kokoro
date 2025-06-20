@@ -156,7 +156,6 @@ export default function DeckExplorer() {
       const parsed = loadoutFromSearchParams(url.searchParams);
       if (parsed) {
         setLoadout(parsed);
-        alert("gktools の URL を読み込みました（カスタマイズ含む）");
       } else {
         alert("読み込み失敗：構成が不完全です");
       }
@@ -233,7 +232,6 @@ export default function DeckExplorer() {
       itemCandidates,
     };
     localStorage.setItem("deckExplorerSavedLoadout", JSON.stringify(saved));
-    alert("ローカルに保存しました。");
   }
 
   function loadSavedLoadout() {
@@ -246,7 +244,6 @@ export default function DeckExplorer() {
       if (saved.itemCandidates) {
         setItemCandidates(saved.itemCandidates);
       }
-      alert("デッキを復元しました。");
     } catch (err) {
       console.error("Load error:", err);
       alert("読み込みに失敗しました。");
@@ -376,7 +373,6 @@ export default function DeckExplorer() {
             style="gray"
             onClick={() => {
               navigator.clipboard.writeText(deckExplorerUrl);
-              alert("そろあじ の URL をコピーしました");
             }}
           >
             そろあじURL
@@ -386,7 +382,6 @@ export default function DeckExplorer() {
             style="gray"
             onClick={() => {
               navigator.clipboard.writeText(simulatorUrl);
-              alert("risシミュ の URL をコピーしました");
             }}
           >
             risシミュURL
