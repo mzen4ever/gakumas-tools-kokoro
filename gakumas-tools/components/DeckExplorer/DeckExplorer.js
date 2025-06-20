@@ -171,8 +171,8 @@ export default function DeckExplorer() {
 
     const allCombos = generateItemCombos(loadout.pItemIds, itemCandidates);
 
-    // ✅ デバッグログ
-    console.log("📊 生成されたコンボ総数:", allCombos.length);
+    // デバッグログ
+    console.log("生成されたコンボ総数:", allCombos.length);
     allCombos.forEach((combo, i) => {
       console.log(`[${i}] combo.length = ${combo.length}:`, combo);
     });
@@ -389,7 +389,7 @@ export default function DeckExplorer() {
         </div>
         <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
           <Button style="gray" onClick={readFromClipboardAndParse}>
-            gktools の URL を読み込み（カスタマイズ含む）
+            risシミュURLから読み込み
           </Button>
         </div>
           
