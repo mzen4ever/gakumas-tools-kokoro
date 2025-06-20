@@ -1,6 +1,5 @@
 "use client";
 import {
-  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -32,20 +31,23 @@ import WorkspaceContext from "@/contexts/WorkspaceContext";
 import { simulate } from "@/simulator";
 import { MAX_WORKERS } from "@/simulator/constants";
 import {
-  bucketScores,
-  getMedianScore,
   getIndications,
+  loadoutFromSearchParams,
+  getSimulatorUrl,
 } from "@/utils/simulator";
+import { getDeckExplorerUrl } from "@/utils/DeckExplorer";
 import { formatStageShortName } from "@/utils/stages";
 import { EntityTypes } from "@/utils/entities";
 
 import DeckExplorerSubTools from "@/components/DeckExplorer/DeckExplorerSubTools";
 import styles from "@/components/DeckExplorer/DeckExplorer.module.scss";
 
+import { useSearchParams } from "next/navigation";
+
 const DEFAULT_NUM_RUNS = 200;
 
 function generateItemCombos(currentItems, candidates) {
-  const usedItems = currentItems.filter((id) => id != null && id !== 0); // ← 修正！
+  const usedItems = currentItems.filter((id) => id != null && id !== 0);
   if (usedItems.length === 0) return [];
 
   const fixed = usedItems[0];
@@ -61,7 +63,6 @@ function generateItemCombos(currentItems, candidates) {
     if (current.length === variableSlotCount) {
       const combo = [fixed, ...current];
       results.push(combo);
-      console.log("生成された組み合わせ:", combo);
       return;
     }
     for (let i = start; i < usable.length; i++) {
@@ -69,23 +70,17 @@ function generateItemCombos(currentItems, candidates) {
     }
   };
 
-  console.log("🧪 generateItemCombos デバッグ");
-  console.log("  currentItems:", currentItems);
-  console.log("  usedItems:", usedItems);
-  console.log("  fixed:", fixed);
-  console.log("  variableSlotCount:", variableSlotCount);
-  console.log("  usable (候補):", usable);
-
   pick([]);
   return results;
 }
 
 export default function DeckExplorer() {
   const t = useTranslations("Simulator");
+  const searchParams = useSearchParams();
+
   const {
     stage,
     loadout,
-    simulatorUrl,
     setSupportBonus,
     setParams,
     replacePItemId,
@@ -109,10 +104,20 @@ export default function DeckExplorer() {
     return new IdolStageConfig(idolConfig, stageConfig);
   }, [loadout, stage]);
 
+  const deckExplorerUrl = useMemo(() => getDeckExplorerUrl(loadout), [loadout]);
+  const simulatorUrl = useMemo(() => getSimulatorUrl(loadout), [loadout]);
+
   const { pItemIndications, skillCardIndicationGroups } = getIndications(
     config,
     loadout
   );
+
+  useEffect(() => {
+    const parsed = loadoutFromSearchParams(searchParams);
+    if (parsed?.hasDataFromParams) {
+      setLoadout(parsed);
+    }
+  }, []);
 
   useEffect(() => {
     let numWorkers = 1;
@@ -134,44 +139,27 @@ export default function DeckExplorer() {
     setItemCandidates(updated);
   }
 
-  function parseSimulatorUrl(url) {
-    try {
-      const parsedUrl = new URL(url);
-      const params = parsedUrl.searchParams;
-
-      const stageId = parseInt(params.get("stage"));
-      const supportBonus = parseFloat(params.get("support_bonus"));
-      const rawParams = params.get("params")?.split("-").map(Number);
-      const rawItems = params.get("items")?.split("-").map(Number);
-      const rawCards = params.get("cards")?.split("_").map(group =>
-        group.split("-").map(Number)
-      );
-
-      const newLoadout = { ...loadout };
-
-      if (!isNaN(stageId)) newLoadout.stageId = stageId;
-      if (!isNaN(supportBonus)) newLoadout.supportBonus = supportBonus;
-      if (rawParams) newLoadout.params = rawParams;
-      if (rawItems) newLoadout.pItemIds = rawItems;
-      if (rawCards) newLoadout.skillCardIdGroups = rawCards;
-
-      setLoadout(newLoadout);
-      alert("設定を読み込みました");
-    } catch (e) {
-      console.error("URL読込エラー:", e);
-      alert("URLの読み込みに失敗しました");
-    }
-  }
-
   async function readFromClipboardAndParse() {
     try {
       const text = await navigator.clipboard.readText();
-      if (!text.includes("gktools.ris.moe/simulator")) {
+      if (!/^https?:\/\/.+/i.test(text)) {
+        alert("有効な URL ではありません。");
+        return;
+      }
+
+      const url = new URL(text);
+      if (!url.hostname.includes("gktools.ris.moe")) {
         alert("gktools のURLではありません。");
         return;
       }
 
-      parseSimulatorUrl(text);  // 既存関数（カスタマイズ除く）
+      const parsed = loadoutFromSearchParams(url.searchParams);
+      if (parsed) {
+        setLoadout(parsed);
+        alert("gktools の URL を読み込みました（カスタマイズ含む）");
+      } else {
+        alert("読み込み失敗：構成が不完全です");
+      }
     } catch (err) {
       console.error("Clipboard error:", err);
       alert("クリップボードの読み込みに失敗しました。");
@@ -378,24 +366,38 @@ export default function DeckExplorer() {
         </div>
 
         <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-          <Button style="gray" onClick={saveCurrentLoadout}>ローカル保存</Button>
-          <Button style="gray" onClick={loadSavedLoadout}>ローカル読込</Button>
+          <Button style="gray" onClick={saveCurrentLoadout}>
+            ローカル保存
+          </Button>
+          <Button style="gray" onClick={loadSavedLoadout}>
+            ローカル読込
+          </Button>
+          <Button
+            style="gray"
+            onClick={() => {
+              navigator.clipboard.writeText(deckExplorerUrl);
+              alert("そろあじ の URL をコピーしました");
+            }}
+          >
+            そろあじURL
+          </Button>
+
           <Button
             style="gray"
             onClick={() => {
               navigator.clipboard.writeText(simulatorUrl);
-              alert("URLをコピーしました");
+              alert("risシミュ の URL をコピーしました");
             }}
           >
-            gktoolsのURLをコピー
+            risシミュURL
           </Button>
         </div>
-
-        <Button style="gray" onClick={readFromClipboardAndParse}>
-          クリップボードからgktoolsのURL読込（カスタマイズを除く）
-        </Button>
-
-
+        <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+          <Button style="gray" onClick={readFromClipboardAndParse}>
+            gktools の URL を読み込み（カスタマイズ含む）
+          </Button>
+        </div>
+          
         <div className={styles.url}>{simulatorUrl}</div>
 
         {topCombos.length > 0 && (
