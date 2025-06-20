@@ -35,7 +35,7 @@ import {
   loadoutFromSearchParams,
   getSimulatorUrl,
 } from "@/utils/simulator";
-import { getDeckExplorerUrl } from "@/utils/DeckExplorer";
+import { getDeckExplorerUrl } from "@/utils/deckexplorer";
 import { formatStageShortName } from "@/utils/stages";
 import { EntityTypes } from "@/utils/entities";
 
