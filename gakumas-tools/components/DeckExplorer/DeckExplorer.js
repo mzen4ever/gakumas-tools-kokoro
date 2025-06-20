@@ -331,23 +331,29 @@ export default function DeckExplorer() {
           <span>{formatStageShortName(stage, t)}</span>
         </div>
 
-        <h4>アイテム候補（最大3つ）</h4>
-        <StagePItems
-          pItemIds={itemCandidates}
-          replacePItemId={replaceItemCandidate}
-          indications={[]}
-          size="small"
-        />
+        <div className={styles.candidateRow}>
+  <div>
+      <h4>アイテム候補（最大3つ）</h4>
+      <StagePItems
+        pItemIds={itemCandidates}
+        replacePItemId={replaceItemCandidate}
+        indications={[]}
+        size="small"
+      />
+    </div>
 
-        <h4>カード候補</h4>
-        <StageSkillCards
-          skillCardIds={cardCandidates}
-          customizations={cardCustomizationsList}
-          replaceSkillCardId={replaceCardSwapCandidate}
-          replaceCustomizations={replaceCardCustomizations}
-          size="small"
-          groupIndex={0}
-        />
+    <div>
+      <h4>カード候補</h4>
+      <StageSkillCards
+        skillCardIds={cardCandidates}
+        customizations={cardCustomizationsList}
+        replaceSkillCardId={replaceCardSwapCandidate}
+        replaceCustomizations={replaceCardCustomizations}
+        size="small"
+        groupIndex={0}
+      />
+    </div>
+  </div>
 
         {loadout.skillCardIdGroups.map((skillCardIdGroup, i) => (
           <LoadoutSkillCardGroup
