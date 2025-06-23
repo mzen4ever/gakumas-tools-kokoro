@@ -154,6 +154,7 @@ export default function DeckExplorer() {
   }
 
   function replaceCardSwapCandidate(index, cardId) {
+    console.log(`カード候補スロット[${index}] にカードID ${cardId} をセット`);
     const updated = [...cardCandidates];
     updated[index] = cardId;
     setCardCandidates(updated);
@@ -203,11 +204,7 @@ export default function DeckExplorer() {
 
     if (explorationMode === "item") {
       const allCombos = generateItemCombos(loadout.pItemIds, itemCandidates);
-
       console.log("生成されたコンボ総数:", allCombos.length);
-      allCombos.forEach((combo, i) => {
-        console.log(`[${i}] combo.length = ${combo.length}:`, combo);
-      });
 
       const combos = allCombos.length <= 64 ? allCombos : allCombos.slice(0, 64);
 
@@ -244,51 +241,85 @@ export default function DeckExplorer() {
         await new Promise((r) => setTimeout(r, 0));
       }
     } else if (explorationMode === "card") {
-      const targetSlot = 2;
+        const targetSlot = 5;
 
-      // memorySets がない場合、fixLoadout してから再実行
-      if (!loadout.memorySets || !loadout.memorySets[0]) {
-        if (loadout.skillCardIdGroups?.[0]) {
-          const fixed = fixLoadout(loadout);
-          setLoadout(fixed);
-          setRunning(false);
-
-          // setState の反映を待つために少し遅らせて再実行
-          setTimeout(() => runSimulation(), 0);
-          return;
-        } else {
-          alert("カード探索を行うには memorySets[0] が必要です。");
-          setRunning(false);
-          return;
+        if (!loadout.memorySets || !loadout.memorySets[0]) {
+          if (loadout.skillCardIdGroups?.[0]) {
+            const fixed = fixLoadout(loadout);
+            setLoadout(fixed);
+            setRunning(false);
+            setTimeout(() => runSimulation(), 0);
+            return;
+          } else {
+            alert("カード探索を行うには memorySets[0] が必要です。");
+            setRunning(false);
+            return;
+          }
         }
-      }
 
-      const baseSet = loadout.memorySets[0];
+        const originalCardId = loadout.memorySets[0].cards?.[targetSlot];
 
-      for (let i = 0; i < cardCandidates.length; i++) {
-        const cardId = cardCandidates[i];
-        if (!cardId) continue;
+        console.log("=== カード探索モード実行 ===");
+        console.log("現在スロット5のカード:", originalCardId);
+        console.log("cardCandidates state:", cardCandidates);
 
-        const newSet = { ...baseSet, cards: [...baseSet.cards] };
-        newSet.cards[targetSlot] = cardId;
+        const candidateIds = Array.from(
+          new Set([originalCardId, ...cardCandidates])
+        ).filter((id) => id != null);
 
-        const newLoadout = {
-          ...loadout,
-          memorySets: [newSet, ...loadout.memorySets.slice(1)],
-        };
+        console.log("候補カード一覧（スロット5に差替）:", candidateIds);
 
-        const newConfig = new IdolStageConfig(
-          new IdolConfig(newLoadout),
-          new StageConfig(stage)
-        );
+        for (let i = 0; i < candidateIds.length; i++) {
+          const cardId = candidateIds[i];
 
-        const result = simulate(newConfig, strategy, numRuns);
-        const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+          // ✅ 完全コピーしてからカード入替
+          const newLoadout = structuredClone(loadout); // または your deepClone(loadout)
 
-        scored.push({ result, cardId, avg });
-        await new Promise((r) => setTimeout(r, 0));
-      }
-    } else {
+          if (
+            !newLoadout.memorySets?.[0]?.cards ||
+            newLoadout.memorySets[0].cards.length <= targetSlot
+          ) {
+            console.warn("スロット不足: memorySets[0].cards =", newLoadout.memorySets[0].cards);
+            continue;
+          }
+
+          newLoadout.memorySets[0].cards[targetSlot] = cardId;
+
+          // ✅ 必要ならカスタマイズも反映（要: cardCustomizationsList[i]）
+          if (cardCustomizationsList[i]) {
+            if (!newLoadout.customizationGroups) {
+              newLoadout.customizationGroups = [];
+            }
+            if (!newLoadout.customizationGroups[0]) {
+              newLoadout.customizationGroups[0] = [];
+            }
+            newLoadout.customizationGroups[0][targetSlot] = cardCustomizationsList[i];
+          }
+
+          console.log("=== シミュレーション候補 ===");
+          console.log("候補カードID:", cardId);
+          console.log("newLoadout.memorySets[0].cards:", newLoadout.memorySets[0].cards);
+          console.log("スロット5のカードID:", newLoadout.memorySets[0].cards[5]);
+
+          const newConfig = new IdolStageConfig(
+            new IdolConfig(newLoadout),
+            new StageConfig(stage)
+          );
+
+          const result = simulate(newConfig, strategy, numRuns);
+          const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+
+          scored.push({
+            result: {
+              ...result,
+              loadout: newLoadout,
+            },
+            avg,
+          });
+
+          await new Promise((r) => setTimeout(r, 0));
+        }
+      } else {
       alert("このモードはまだ対応していません。");
     }
 
@@ -535,13 +566,13 @@ export default function DeckExplorer() {
                 <h4>カード候補の上位</h4>
                 <div className={styles.comboRow}>
                   {topCombos
-                    .filter((entry) => entry.cardId)
+                    .filter((entry) => entry.result?.loadout?.memorySets?.[0]?.cards?.[5])
                     .map((entry, idx) => (
                       <div key={`card-${idx}`} className={styles.comboGroup}>
                         <div className={styles.comboIcons}>
                           <EntityIcon
                             type={EntityTypes.SKILL_CARD}
-                            id={entry.cardId}
+                            id={entry.result.loadout.memorySets[0].cards[5]} // ← 正しいスロット
                             style="medium"
                           />
                         </div>
