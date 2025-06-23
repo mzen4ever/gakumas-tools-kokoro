@@ -319,9 +319,69 @@ export default function DeckExplorer() {
 
           await new Promise((r) => setTimeout(r, 0));
         }
-      } else {
-      alert("このモードはまだ対応していません。");
-    }
+      } else if (explorationMode === "both") {
+        const targetSlot = 5;
+
+        if (!loadout.memorySets || !loadout.memorySets[0]) {
+          if (loadout.skillCardIdGroups?.[0]) {
+            const fixed = fixLoadout(loadout);
+            setLoadout(fixed);
+            setRunning(false);
+            setTimeout(() => runSimulation(), 0);
+            return;
+          } else {
+            alert("両方探索を行うには memorySets[0] が必要です。");
+            setRunning(false);
+            return;
+          }
+        }
+
+        const originalCardId = loadout.memorySets[0].cards?.[targetSlot];
+        const cardIds = Array.from(new Set([originalCardId, ...cardCandidates])).filter((id) => id != null);
+        const itemCombos = generateItemCombos(loadout.pItemIds, itemCandidates);
+
+        console.log("=== 両方探索モード実行 ===");
+        console.log("カード候補:", cardIds);
+        console.log("アイテム候補組み合わせ:", itemCombos.length);
+
+        for (let i = 0; i < itemCombos.length; i++) {
+          const itemCombo = itemCombos[i];
+
+          for (let j = 0; j < cardIds.length; j++) {
+            const cardId = cardIds[j];
+
+            const newLoadout = structuredClone(loadout);
+            newLoadout.pItemIds = itemCombo;
+            newLoadout.memorySets[0].cards[targetSlot] = cardId;
+
+            if (cardCustomizationsList[j]) {
+              if (!newLoadout.customizationGroups) newLoadout.customizationGroups = [];
+              if (!newLoadout.customizationGroups[0]) newLoadout.customizationGroups[0] = [];
+              newLoadout.customizationGroups[0][targetSlot] = cardCustomizationsList[j];
+            }
+
+            console.log(`[${i}-${j}] itemCombo:`, itemCombo, "cardId:", cardId);
+
+            const newConfig = new IdolStageConfig(
+              new IdolConfig(newLoadout),
+              new StageConfig(stage)
+            );
+
+            const result = simulate(newConfig, strategy, numRuns);
+            const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+
+            scored.push({
+              result: {
+                ...result,
+                loadout: newLoadout,
+              },
+              avg,
+            });
+
+            await new Promise((r) => setTimeout(r, 0));
+          }
+        }
+      }
 
     scored.sort((a, b) => b.avg - a.avg);
     setSimulatorData(scored[0]?.result || null);
@@ -534,7 +594,8 @@ export default function DeckExplorer() {
 
         {topCombos.length > 0 && (
           <div className={styles.results}>
-            {explorationMode !== "card" && (
+            {/* アイテム候補の上位 */}
+            {explorationMode === "item" && (
               <>
                 <h4>アイテム候補の上位</h4>
                 <div className={styles.comboRow}>
@@ -561,7 +622,8 @@ export default function DeckExplorer() {
               </>
             )}
 
-            {explorationMode !== "item" && (
+            {/* カード候補の上位 */}
+            {explorationMode === "card" && (
               <>
                 <h4>カード候補の上位</h4>
                 <div className={styles.comboRow}>
@@ -572,9 +634,46 @@ export default function DeckExplorer() {
                         <div className={styles.comboIcons}>
                           <EntityIcon
                             type={EntityTypes.SKILL_CARD}
-                            id={entry.result.loadout.memorySets[0].cards[5]} // ← 正しいスロット
+                            id={entry.result.loadout.memorySets[0].cards[5]}
                             style="medium"
                           />
+                        </div>
+                        <div className={styles.comboScore}>
+                          スコア: {Math.round(entry.avg)}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </>
+            )}
+
+            {/* 両方候補の上位 */}
+            {explorationMode === "both" && (
+              <>
+                <h4>両方候補の上位</h4>
+                <div className={styles.comboRow}>
+                  {topCombos
+                    .filter(
+                      (entry) =>
+                        entry.result?.loadout?.memorySets?.[0]?.cards?.[5] != null &&
+                        entry.result?.loadout?.pItemIds?.length >= 2
+                    )
+                    .map((entry, idx) => (
+                      <div key={`both-${idx}`} className={styles.comboGroup}>
+                        <div className={styles.comboIcons}>
+                          <EntityIcon
+                            type={EntityTypes.SKILL_CARD}
+                            id={entry.result.loadout.memorySets[0].cards[5]}
+                            style="medium"
+                          />
+                          {entry.result.loadout.pItemIds.slice(1).map((id, i) => (
+                            <EntityIcon
+                              key={i}
+                              type={EntityTypes.P_ITEM}
+                              id={id}
+                              style="medium"
+                            />
+                          ))}
                         </div>
                         <div className={styles.comboScore}>
                           スコア: {Math.round(entry.avg)}
