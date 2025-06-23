@@ -199,7 +199,16 @@ export default function DeckExplorer() {
     console.time("simulation");
 
     const numWorkers = workersRef.current?.length || 1;
-    const runsPerWorker = Math.round(numRuns / numWorkers);
+
+    // ▼ リミッター適用：bothモードでは最大400試行
+    const effectiveNumRuns =
+      explorationMode === "both" && numRuns > 400 ? 400 : numRuns;
+
+    if (explorationMode === "both" && numRuns > 400) {
+      alert("両方モードでは試行回数が多すぎるため、400回に制限されました。");
+    }
+
+    const runsPerWorker = Math.round(effectiveNumRuns / numWorkers);
     const scored = [];
 
     if (explorationMode === "item") {
@@ -233,7 +242,7 @@ export default function DeckExplorer() {
           const avg = scores.reduce((sum, v) => sum + v, 0) / scores.length;
           scored.push({ result: results[0], combo, avg });
         } else {
-          const result = simulate(newConfig, strategy, numRuns);
+          const result = simulate(newConfig, strategy, effectiveNumRuns);
           const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
           scored.push({ result, combo, avg });
         }
@@ -261,11 +270,6 @@ export default function DeckExplorer() {
       const originalCustomization =
         loadout.customizationGroups?.[0]?.[targetSlot] || [];
 
-      console.log("=== カード探索モード実行 ===");
-      console.log("現在スロット5のカード:", originalCardId);
-      console.log("cardCandidates state:", cardCandidates);
-
-      // 現在のカード + 候補カード
       const allCandidates = [{ cardId: originalCardId, customization: originalCustomization }];
       for (let i = 0; i < cardCandidates.length; i++) {
         const cardId = cardCandidates[i];
@@ -273,8 +277,6 @@ export default function DeckExplorer() {
         const customization = cardCustomizationsList[i] || [];
         allCandidates.push({ cardId, customization });
       }
-
-      console.log("候補カード一覧（スロット5に差替）:", allCandidates);
 
       for (const { cardId, customization } of allCandidates) {
         const newLoadout = structuredClone(loadout);
@@ -286,17 +288,12 @@ export default function DeckExplorer() {
         if (!newLoadout.customizationGroups[0]) newLoadout.customizationGroups[0] = [];
         newLoadout.customizationGroups[0][targetSlot] = customization;
 
-        console.log("=== シミュレーション候補 ===");
-        console.log("候補カードID:", cardId);
-        console.log("カスタマイズ:", customization);
-        console.log("newLoadout.memorySets[0].cards:", newLoadout.memorySets[0].cards);
-
         const newConfig = new IdolStageConfig(
           new IdolConfig(newLoadout),
           new StageConfig(stage)
         );
 
-        const result = simulate(newConfig, strategy, numRuns);
+        const result = simulate(newConfig, strategy, effectiveNumRuns);
         const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
 
         scored.push({
@@ -310,86 +307,69 @@ export default function DeckExplorer() {
         await new Promise((r) => setTimeout(r, 0));
       }
     } else if (explorationMode === "both") {
-        const targetSlot = 5;
+      const targetSlot = 5;
 
-        if (!loadout.memorySets || !loadout.memorySets[0]) {
-          if (loadout.skillCardIdGroups?.[0]) {
-            const fixed = fixLoadout(loadout);
-            setLoadout(fixed);
-            setRunning(false);
-            setTimeout(() => runSimulation(), 0);
-            return;
-          } else {
-            alert("両方探索を行うには memorySets[0] が必要です。");
-            setRunning(false);
-            return;
-          }
-        }
-
-        const originalCardId = loadout.memorySets[0].cards?.[targetSlot];
-        const originalCustomization =
-          loadout.customizationGroups?.[0]?.[targetSlot] || [];
-
-        // ✅ カード＋カスタマイズで全候補をリスト化
-        const allCandidates = [
-          { cardId: originalCardId, customization: originalCustomization },
-        ];
-
-        for (let i = 0; i < cardCandidates.length; i++) {
-          const cardId = cardCandidates[i];
-          if (!cardId) continue;
-          const customization = cardCustomizationsList[i] || [];
-          allCandidates.push({ cardId, customization });
-        }
-
-        console.log("=== 両方探索モード実行 ===");
-        console.log("カード候補:", allCandidates);
-        console.log("アイテム候補数:", itemCandidates.length);
-
-        for (const { cardId, customization } of allCandidates) {
-          const newLoadoutBase = structuredClone(loadout);
-          newLoadoutBase.memorySets[0].cards[targetSlot] = cardId;
-
-          if (!newLoadoutBase.customizationGroups)
-            newLoadoutBase.customizationGroups = [];
-          if (!newLoadoutBase.customizationGroups[0])
-            newLoadoutBase.customizationGroups[0] = [];
-
-          newLoadoutBase.customizationGroups[0][targetSlot] = customization;
-
-          const itemCombos = generateItemCombos(
-            loadout.pItemIds,
-            itemCandidates
-          );
-          const combos =
-            itemCombos.length <= 64 ? itemCombos : itemCombos.slice(0, 64);
-
-          for (const itemCombo of combos) {
-            const newLoadout = structuredClone(newLoadoutBase);
-            newLoadout.pItemIds = itemCombo;
-
-            const newConfig = new IdolStageConfig(
-              new IdolConfig(newLoadout),
-              new StageConfig(stage)
-            );
-
-            const result = simulate(newConfig, strategy, numRuns);
-            const avg =
-              result.scores.reduce((sum, v) => sum + v, 0) /
-              result.scores.length;
-
-            scored.push({
-              result: {
-                ...result,
-                loadout: newLoadout,
-              },
-              avg,
-            });
-
-            await new Promise((r) => setTimeout(r, 0));
-          }
+      if (!loadout.memorySets || !loadout.memorySets[0]) {
+        if (loadout.skillCardIdGroups?.[0]) {
+          const fixed = fixLoadout(loadout);
+          setLoadout(fixed);
+          setRunning(false);
+          setTimeout(() => runSimulation(), 0);
+          return;
+        } else {
+          alert("両方探索を行うには memorySets[0] が必要です。");
+          setRunning(false);
+          return;
         }
       }
+
+      const originalCardId = loadout.memorySets[0].cards?.[targetSlot];
+      const originalCustomization =
+        loadout.customizationGroups?.[0]?.[targetSlot] || [];
+
+      const allCandidates = [{ cardId: originalCardId, customization: originalCustomization }];
+      for (let i = 0; i < cardCandidates.length; i++) {
+        const cardId = cardCandidates[i];
+        if (!cardId) continue;
+        const customization = cardCustomizationsList[i] || [];
+        allCandidates.push({ cardId, customization });
+      }
+
+      for (const { cardId, customization } of allCandidates) {
+        const newLoadoutBase = structuredClone(loadout);
+        newLoadoutBase.memorySets[0].cards[targetSlot] = cardId;
+
+        if (!newLoadoutBase.customizationGroups) newLoadoutBase.customizationGroups = [];
+        if (!newLoadoutBase.customizationGroups[0]) newLoadoutBase.customizationGroups[0] = [];
+        newLoadoutBase.customizationGroups[0][targetSlot] = customization;
+
+        const itemCombos = generateItemCombos(loadout.pItemIds, itemCandidates);
+        const combos = itemCombos.length <= 64 ? itemCombos : itemCombos.slice(0, 64);
+
+        for (const itemCombo of combos) {
+          const newLoadout = structuredClone(newLoadoutBase);
+          newLoadout.pItemIds = itemCombo;
+
+          const newConfig = new IdolStageConfig(
+            new IdolConfig(newLoadout),
+            new StageConfig(stage)
+          );
+
+          const result = simulate(newConfig, strategy, effectiveNumRuns);
+          const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+
+          scored.push({
+            result: {
+              ...result,
+              loadout: newLoadout,
+            },
+            avg,
+          });
+
+          await new Promise((r) => setTimeout(r, 0));
+        }
+      }
+    }
 
     scored.sort((a, b) => b.avg - a.avg);
     setSimulatorData(scored[0]?.result || null);
@@ -597,8 +577,6 @@ export default function DeckExplorer() {
             risシミュURLから読み込み
           </Button>
         </div>
-          
-        <div className={styles.url}>{simulatorUrl}</div>
 
         {topCombos.length > 0 && (
           <div className={styles.results}>
