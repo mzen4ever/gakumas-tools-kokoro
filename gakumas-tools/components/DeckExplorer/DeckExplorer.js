@@ -241,85 +241,75 @@ export default function DeckExplorer() {
         await new Promise((r) => setTimeout(r, 0));
       }
     } else if (explorationMode === "card") {
-        const targetSlot = 5;
+      const targetSlot = 5;
 
-        if (!loadout.memorySets || !loadout.memorySets[0]) {
-          if (loadout.skillCardIdGroups?.[0]) {
-            const fixed = fixLoadout(loadout);
-            setLoadout(fixed);
-            setRunning(false);
-            setTimeout(() => runSimulation(), 0);
-            return;
-          } else {
-            alert("カード探索を行うには memorySets[0] が必要です。");
-            setRunning(false);
-            return;
-          }
+      if (!loadout.memorySets || !loadout.memorySets[0]) {
+        if (loadout.skillCardIdGroups?.[0]) {
+          const fixed = fixLoadout(loadout);
+          setLoadout(fixed);
+          setRunning(false);
+          setTimeout(() => runSimulation(), 0);
+          return;
+        } else {
+          alert("カード探索を行うには memorySets[0] が必要です。");
+          setRunning(false);
+          return;
         }
+      }
 
-        const originalCardId = loadout.memorySets[0].cards?.[targetSlot];
+      const originalCardId = loadout.memorySets[0].cards?.[targetSlot];
+      const originalCustomization =
+        loadout.customizationGroups?.[0]?.[targetSlot] || [];
 
-        console.log("=== カード探索モード実行 ===");
-        console.log("現在スロット5のカード:", originalCardId);
-        console.log("cardCandidates state:", cardCandidates);
+      console.log("=== カード探索モード実行 ===");
+      console.log("現在スロット5のカード:", originalCardId);
+      console.log("cardCandidates state:", cardCandidates);
 
-        const candidateIds = Array.from(
-          new Set([originalCardId, ...cardCandidates])
-        ).filter((id) => id != null);
+      // 現在のカード + 候補カード
+      const allCandidates = [{ cardId: originalCardId, customization: originalCustomization }];
+      for (let i = 0; i < cardCandidates.length; i++) {
+        const cardId = cardCandidates[i];
+        if (!cardId) continue;
+        const customization = cardCustomizationsList[i] || [];
+        allCandidates.push({ cardId, customization });
+      }
 
-        console.log("候補カード一覧（スロット5に差替）:", candidateIds);
+      console.log("候補カード一覧（スロット5に差替）:", allCandidates);
 
-        for (let i = 0; i < candidateIds.length; i++) {
-          const cardId = candidateIds[i];
+      for (const { cardId, customization } of allCandidates) {
+        const newLoadout = structuredClone(loadout);
+        if (!newLoadout.memorySets?.[0]?.cards) continue;
 
-          // ✅ 完全コピーしてからカード入替
-          const newLoadout = structuredClone(loadout); // または your deepClone(loadout)
+        newLoadout.memorySets[0].cards[targetSlot] = cardId;
 
-          if (
-            !newLoadout.memorySets?.[0]?.cards ||
-            newLoadout.memorySets[0].cards.length <= targetSlot
-          ) {
-            console.warn("スロット不足: memorySets[0].cards =", newLoadout.memorySets[0].cards);
-            continue;
-          }
+        if (!newLoadout.customizationGroups) newLoadout.customizationGroups = [];
+        if (!newLoadout.customizationGroups[0]) newLoadout.customizationGroups[0] = [];
+        newLoadout.customizationGroups[0][targetSlot] = customization;
 
-          newLoadout.memorySets[0].cards[targetSlot] = cardId;
+        console.log("=== シミュレーション候補 ===");
+        console.log("候補カードID:", cardId);
+        console.log("カスタマイズ:", customization);
+        console.log("newLoadout.memorySets[0].cards:", newLoadout.memorySets[0].cards);
 
-          // ✅ 必要ならカスタマイズも反映（要: cardCustomizationsList[i]）
-          if (cardCustomizationsList[i]) {
-            if (!newLoadout.customizationGroups) {
-              newLoadout.customizationGroups = [];
-            }
-            if (!newLoadout.customizationGroups[0]) {
-              newLoadout.customizationGroups[0] = [];
-            }
-            newLoadout.customizationGroups[0][targetSlot] = cardCustomizationsList[i];
-          }
+        const newConfig = new IdolStageConfig(
+          new IdolConfig(newLoadout),
+          new StageConfig(stage)
+        );
 
-          console.log("=== シミュレーション候補 ===");
-          console.log("候補カードID:", cardId);
-          console.log("newLoadout.memorySets[0].cards:", newLoadout.memorySets[0].cards);
-          console.log("スロット5のカードID:", newLoadout.memorySets[0].cards[5]);
+        const result = simulate(newConfig, strategy, numRuns);
+        const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
 
-          const newConfig = new IdolStageConfig(
-            new IdolConfig(newLoadout),
-            new StageConfig(stage)
-          );
+        scored.push({
+          result: {
+            ...result,
+            loadout: newLoadout,
+          },
+          avg,
+        });
 
-          const result = simulate(newConfig, strategy, numRuns);
-          const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
-
-          scored.push({
-            result: {
-              ...result,
-              loadout: newLoadout,
-            },
-            avg,
-          });
-
-          await new Promise((r) => setTimeout(r, 0));
-        }
-      } else if (explorationMode === "both") {
+        await new Promise((r) => setTimeout(r, 0));
+      }
+    } else if (explorationMode === "both") {
         const targetSlot = 5;
 
         if (!loadout.memorySets || !loadout.memorySets[0]) {
@@ -337,30 +327,46 @@ export default function DeckExplorer() {
         }
 
         const originalCardId = loadout.memorySets[0].cards?.[targetSlot];
-        const cardIds = Array.from(new Set([originalCardId, ...cardCandidates])).filter((id) => id != null);
-        const itemCombos = generateItemCombos(loadout.pItemIds, itemCandidates);
+        const originalCustomization =
+          loadout.customizationGroups?.[0]?.[targetSlot] || [];
+
+        // ✅ カード＋カスタマイズで全候補をリスト化
+        const allCandidates = [
+          { cardId: originalCardId, customization: originalCustomization },
+        ];
+
+        for (let i = 0; i < cardCandidates.length; i++) {
+          const cardId = cardCandidates[i];
+          if (!cardId) continue;
+          const customization = cardCustomizationsList[i] || [];
+          allCandidates.push({ cardId, customization });
+        }
 
         console.log("=== 両方探索モード実行 ===");
-        console.log("カード候補:", cardIds);
-        console.log("アイテム候補組み合わせ:", itemCombos.length);
+        console.log("カード候補:", allCandidates);
+        console.log("アイテム候補数:", itemCandidates.length);
 
-        for (let i = 0; i < itemCombos.length; i++) {
-          const itemCombo = itemCombos[i];
+        for (const { cardId, customization } of allCandidates) {
+          const newLoadoutBase = structuredClone(loadout);
+          newLoadoutBase.memorySets[0].cards[targetSlot] = cardId;
 
-          for (let j = 0; j < cardIds.length; j++) {
-            const cardId = cardIds[j];
+          if (!newLoadoutBase.customizationGroups)
+            newLoadoutBase.customizationGroups = [];
+          if (!newLoadoutBase.customizationGroups[0])
+            newLoadoutBase.customizationGroups[0] = [];
 
-            const newLoadout = structuredClone(loadout);
+          newLoadoutBase.customizationGroups[0][targetSlot] = customization;
+
+          const itemCombos = generateItemCombos(
+            loadout.pItemIds,
+            itemCandidates
+          );
+          const combos =
+            itemCombos.length <= 64 ? itemCombos : itemCombos.slice(0, 64);
+
+          for (const itemCombo of combos) {
+            const newLoadout = structuredClone(newLoadoutBase);
             newLoadout.pItemIds = itemCombo;
-            newLoadout.memorySets[0].cards[targetSlot] = cardId;
-
-            if (cardCustomizationsList[j]) {
-              if (!newLoadout.customizationGroups) newLoadout.customizationGroups = [];
-              if (!newLoadout.customizationGroups[0]) newLoadout.customizationGroups[0] = [];
-              newLoadout.customizationGroups[0][targetSlot] = cardCustomizationsList[j];
-            }
-
-            console.log(`[${i}-${j}] itemCombo:`, itemCombo, "cardId:", cardId);
 
             const newConfig = new IdolStageConfig(
               new IdolConfig(newLoadout),
@@ -368,7 +374,9 @@ export default function DeckExplorer() {
             );
 
             const result = simulate(newConfig, strategy, numRuns);
-            const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+            const avg =
+              result.scores.reduce((sum, v) => sum + v, 0) /
+              result.scores.length;
 
             scored.push({
               result: {
@@ -628,21 +636,27 @@ export default function DeckExplorer() {
                 <h4>カード候補の上位</h4>
                 <div className={styles.comboRow}>
                   {topCombos
-                    .filter((entry) => entry.result?.loadout?.memorySets?.[0]?.cards?.[5])
-                    .map((entry, idx) => (
-                      <div key={`card-${idx}`} className={styles.comboGroup}>
-                        <div className={styles.comboIcons}>
-                          <EntityIcon
-                            type={EntityTypes.SKILL_CARD}
-                            id={entry.result.loadout.memorySets[0].cards[5]}
-                            style="medium"
-                          />
+                    .filter((entry) => entry.result?.loadout?.memorySets?.[0]?.cards?.[5] != null)
+                    .map((entry, idx) => {
+                      const cardId = entry.result.loadout.memorySets[0].cards[5];
+                      const customization = entry.result.loadout.customizationGroups?.[0]?.[5] || [];
+
+                      return (
+                        <div key={`card-${idx}`} className={styles.comboGroup}>
+                          <div className={styles.comboIcons}>
+                            <EntityIcon
+                              type={EntityTypes.SKILL_CARD}
+                              id={cardId}
+                              style="medium"
+                              customizations={customization}
+                            />
+                          </div>
+                          <div className={styles.comboScore}>
+                            スコア: {Math.round(entry.avg)}
+                          </div>
                         </div>
-                        <div className={styles.comboScore}>
-                          スコア: {Math.round(entry.avg)}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                 </div>
               </>
             )}
@@ -655,31 +669,42 @@ export default function DeckExplorer() {
                   {topCombos
                     .filter(
                       (entry) =>
-                        entry.result?.loadout?.memorySets?.[0]?.cards?.[5] != null &&
-                        entry.result?.loadout?.pItemIds?.length >= 2
+                        entry?.result?.loadout?.memorySets?.[0]?.cards?.[5] != null &&
+                        Array.isArray(entry?.result?.loadout?.pItemIds) &&
+                        entry.result.loadout.pItemIds.length >= 2
                     )
-                    .map((entry, idx) => (
-                      <div key={`both-${idx}`} className={styles.comboGroup}>
-                        <div className={styles.comboIcons}>
-                          <EntityIcon
-                            type={EntityTypes.SKILL_CARD}
-                            id={entry.result.loadout.memorySets[0].cards[5]}
-                            style="medium"
-                          />
-                          {entry.result.loadout.pItemIds.slice(1).map((id, i) => (
+                    .map((entry, idx) => {
+                      const loadout = entry.result.loadout;
+                      const cardId = loadout.memorySets[0].cards[5];
+                      const customization = loadout.customizationGroups?.[0]?.[5] || [];
+                      const itemIds = loadout.pItemIds.slice(1); // slot 1 and 2
+
+                      return (
+                        <div key={`both-${idx}`} className={styles.comboGroup}>
+                          <div className={styles.comboIcons}>
                             <EntityIcon
-                              key={i}
-                              type={EntityTypes.P_ITEM}
-                              id={id}
+                              type={EntityTypes.SKILL_CARD}
+                              id={cardId}
                               style="medium"
+                              customizations={customization}
                             />
-                          ))}
+                            {itemIds.map((id, i) =>
+                              id ? (
+                                <EntityIcon
+                                  key={`item-${i}`}
+                                  type={EntityTypes.P_ITEM}
+                                  id={id}
+                                  style="medium"
+                                />
+                              ) : null
+                            )}
+                          </div>
+                          <div className={styles.comboScore}>
+                            スコア: {Math.round(entry.avg)}
+                          </div>
                         </div>
-                        <div className={styles.comboScore}>
-                          スコア: {Math.round(entry.avg)}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                 </div>
               </>
             )}
