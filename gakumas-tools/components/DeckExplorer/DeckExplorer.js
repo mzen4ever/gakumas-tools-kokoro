@@ -305,6 +305,23 @@ export default function DeckExplorer() {
 
       const seenLoadoutKeys = new Set();
 
+      function getNormalizedLoadoutKey(loadout) {
+        const normalized = loadout.memorySets.map((group, gi) => {
+          return group.cards.map((cardId, si) => {
+            const customization = loadout.customizationGroups?.[gi]?.[si] || {};
+            return {
+              cardId,
+              customization,
+            };
+          }).sort((a, b) => a.cardId - b.cardId);
+        });
+
+        return JSON.stringify({
+          normalizedLoadout: normalized,
+          pItemIds: loadout.pItemIds,
+        });
+      }
+
       if (!loadout.memorySets || !loadout.memorySets[0]) {
         if (loadout.skillCardIdGroups?.[0]) {
           const fixed = fixLoadout(loadout);
@@ -333,11 +350,7 @@ export default function DeckExplorer() {
 
       // ✅ 元構成を常に含める
       {
-        const originalKey = JSON.stringify({
-          memorySets: loadout.memorySets,
-          customizationGroups: loadout.customizationGroups,
-          pItemIds: loadout.pItemIds,
-        });
+        const originalKey = getNormalizedLoadoutKey(loadout);
         if (!seenLoadoutKeys.has(originalKey)) {
           seenLoadoutKeys.add(originalKey);
 
@@ -397,7 +410,6 @@ export default function DeckExplorer() {
               const { groupIndex, slotIndex } = slots[i];
               const { cardId, customization } = cards[i];
 
-              // ✅ 重複チェック（差し替え対象スロットを除いたカードと比較）
               const currentCards = [...newLoadout.memorySets[groupIndex].cards];
               for (let j = 0; j < k; j++) {
                 const { groupIndex: gi, slotIndex: si } = slots[j];
@@ -419,11 +431,7 @@ export default function DeckExplorer() {
             });
             if (overLimit) continue;
 
-            const key = JSON.stringify({
-              memorySets: newLoadout.memorySets,
-              customizationGroups: newLoadout.customizationGroups,
-              pItemIds: newLoadout.pItemIds,
-            });
+            const key = getNormalizedLoadoutKey(newLoadout);
             if (seenLoadoutKeys.has(key)) continue;
             seenLoadoutKeys.add(key);
 
