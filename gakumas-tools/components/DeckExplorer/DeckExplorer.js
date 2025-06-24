@@ -240,6 +240,34 @@ export default function DeckExplorer() {
     }
   }
 
+  function runSimulationWithWorkers(workers, config, strategy, numRuns) {
+    if (!workers || workers.length === 0) {
+      const result = simulate(config, strategy, numRuns);
+      const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+      return Promise.resolve({ result, avg });
+    }
+
+    const runsPerWorker = Math.round(numRuns / workers.length);
+
+    const promises = workers.map(
+      (worker) =>
+        new Promise((resolve) => {
+          worker.onmessage = (e) => resolve(e.data);
+          worker.postMessage({
+            idolStageConfig: config,
+            strategyName: strategy,
+            numRuns: runsPerWorker,
+          });
+        })
+    );
+
+    return Promise.all(promises).then((results) => {
+      const allScores = results.flatMap((res) => res.scores);
+      const avg = allScores.reduce((sum, v) => sum + v, 0) / allScores.length;
+      return { result: results[0], avg };
+    });
+  }
+
   async function runSimulation() {
     setRunning(true);
     console.time("simulation");
@@ -288,8 +316,12 @@ export default function DeckExplorer() {
           const avg = scores.reduce((sum, v) => sum + v, 0) / scores.length;
           scored.push({ result: results[0], combo, avg });
         } else {
-          const result = simulate(newConfig, strategy, effectiveNumRuns);
-          const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+          const { result, avg } = await runSimulationWithWorkers(
+            workersRef.current,
+            newConfig,
+            strategy,
+            effectiveNumRuns
+          );
           scored.push({ result, combo, avg });
         }
 
@@ -355,8 +387,13 @@ export default function DeckExplorer() {
             new IdolConfig(newLoadout),
             new StageConfig(stage)
           );
-          const result = simulate(newConfig, strategy, effectiveNumRuns);
-          const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+          const { result, avg } = await runSimulationWithWorkers(
+            workersRef.current,
+            newConfig,
+            strategy,
+            effectiveNumRuns
+          );
+
           scored.push({
             result: {
               ...result,
@@ -450,9 +487,12 @@ export default function DeckExplorer() {
               new StageConfig(stage)
             );
 
-            const result = simulate(newConfig, strategy, effectiveNumRuns);
-            const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
-
+            const { result, avg } = await runSimulationWithWorkers(
+              workersRef.current,
+              newConfig,
+              strategy,
+              effectiveNumRuns
+            );
             scored.push({
               result: {
                 ...result,
@@ -514,8 +554,12 @@ export default function DeckExplorer() {
             new StageConfig(stage)
           );
 
-          const result = simulate(newConfig, strategy, effectiveNumRuns);
-          const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+          const { result, avg } = await runSimulationWithWorkers(
+            workersRef.current,
+            newConfig,
+            strategy,
+            effectiveNumRuns
+          );
 
           scored.push({
             result: {
