@@ -92,8 +92,8 @@ export default function DeckExplorer() {
   const [strategy, setStrategy] = useState("HeuristicStrategy");
   const [simulatorData, setSimulatorData] = useState(null);
   const [itemCandidates, setItemCandidates] = useState([null, null, null]);
-  const [cardCandidates, setCardCandidates] = useState([null]);
-  const [cardCustomizationsList, setCardCustomizationsList] = useState([]);
+  const [cardCandidates, setCardCandidates] = useState([null, null, null]);
+  const [cardCustomizationsList, setCardCustomizationsList] = useState([[], [], []]);
   const [customizationLimit, setCustomizationLimit] = useState(1);
   const [explorationMode, setExplorationMode] = useState("item");
   const [running, setRunning] = useState(false);
