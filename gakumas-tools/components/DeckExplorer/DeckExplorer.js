@@ -583,28 +583,28 @@ export default function DeckExplorer() {
         </div>
 
         <div className={styles.candidateRow}>
-  <div>
-      <h4>アイテム候補（最大3つ）</h4>
-      <StagePItems
-        pItemIds={itemCandidates}
-        replacePItemId={replaceItemCandidate}
-        indications={[]}
-        size="small"
-      />
-    </div>
+          <div>
+            <h4>アイテム候補</h4>
+            <StagePItems
+              pItemIds={itemCandidates}
+              replacePItemId={replaceItemCandidate}
+              indications={[]}
+              size="small"
+            />
+          </div>
 
-    <div>
-      <h4>カード候補</h4>
-      <StageSkillCards
-        skillCardIds={cardCandidates}
-        customizations={cardCustomizationsList}
-        replaceSkillCardId={replaceCardSwapCandidate}
-        replaceCustomizations={replaceCardCustomizations}
-        size="small"
-        groupIndex={0}
-      />
-    </div>
-  </div>
+          <div>
+            <h4>カード候補</h4>
+            <StageSkillCards
+              skillCardIds={cardCandidates}
+              customizations={cardCustomizationsList}
+              replaceSkillCardId={replaceCardSwapCandidate}
+              replaceCustomizations={replaceCardCustomizations}
+              size="small"
+              groupIndex={0}
+            />
+          </div>
+        </div>
 
         {loadout.skillCardIdGroups.map((skillCardIdGroup, i) => (
           <LoadoutSkillCardGroup
@@ -704,6 +704,26 @@ export default function DeckExplorer() {
             risシミュURLから読み込み
           </Button>
         </div>
+
+        <details>
+          <summary style={{ cursor: "pointer", fontWeight: "bold" }}>
+            ★カード探索の仕様
+          </summary>
+          <div style={{ paddingLeft: "1em", marginTop: "0.5em" }}>
+            <p>カード候補に登録したカードは、指定されたスロットに差し替え候補として使用されます。</p>
+            <ul>
+              <li>差し替え対象スロットはメモリーセット1・2のスロット5・6です。</li>
+              <li>カード候補は複数指定可能で、カスタマイズも反映されます。</li>
+              <li>1スロットのみの差し替えに加え、複数スロットを同時に差し替える組み合わせも自動的に探索されます。</li>
+              <li><u>カスタマイズ上限（1セットあたり）を超える構成は除外されます。</u></li>
+            </ul>
+            <p><u>メモリーセットの1・2スロット目は固定されています。どちらかにアイドル固有カード、もしくはサポカを設定してください（ここにセットしたカードはカスタマイズ数の計算から除外されます）。</u></p>
+            <p>スコアが高かった構成が「カード候補の上位」として表示されます。</p>
+            <p style={{ color: "red", fontWeight: "bold", marginTop: "1em" }}>
+              ※ 試行回数を増やすと非常に重くなります。200設定のまま何回か回して傾向を掴む使い方をおすすめします。
+            </p>
+          </div>
+        </details>
 
         {topCombos.length > 0 && (
           <div className={styles.results}>
