@@ -741,13 +741,10 @@ export default function DeckExplorer() {
             そろあじURL
           </Button>
 
-          <Button
-            style="gray"
-            onClick={() => {
-              navigator.clipboard.writeText(simulatorUrl);
-            }}
-          >
-            risシミュURL
+          <Button asChild style="gray">
+            <a href={simulatorUrl} target="_blank" rel="noopener noreferrer">
+              risシミュへ遷移
+            </a>
           </Button>
         </div>
         <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
