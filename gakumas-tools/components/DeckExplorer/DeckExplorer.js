@@ -260,7 +260,9 @@ export default function DeckExplorer() {
       }
     } else if (explorationMode === "card") {
       const targetSlots = [
+        { groupIndex: 0, slotIndex: 4 },
         { groupIndex: 0, slotIndex: 5 },
+        { groupIndex: 1, slotIndex: 4 },
         { groupIndex: 1, slotIndex: 5 },
       ];
 
@@ -302,6 +304,8 @@ export default function DeckExplorer() {
           const newLoadout = structuredClone(loadout);
 
           if (!newLoadout.memorySets[groupIndex]?.cards) continue;
+          const currentCards = newLoadout.memorySets[groupIndex].cards;
+          if (currentCards.includes(cardId)) continue;
           newLoadout.memorySets[groupIndex].cards[slotIndex] = cardId;
 
           // カスタマイズの初期化とコピー（安全対応版）
@@ -429,6 +433,7 @@ export default function DeckExplorer() {
     setTopCombos(scored.slice(0, 5));
     setRunning(false);
     console.timeEnd("simulation");
+    console.log(`カード探索で実行された構成数: ${scored.length}`);
   }
 
   function saveCurrentLoadout() {
