@@ -305,23 +305,6 @@ export default function DeckExplorer() {
 
       const seenLoadoutKeys = new Set();
 
-      function getNormalizedLoadoutKey(loadout) {
-        const normalized = loadout.memorySets.map((group, gi) => {
-          return group.cards.map((cardId, si) => {
-            const customization = loadout.customizationGroups?.[gi]?.[si] || {};
-            return {
-              cardId,
-              customization,
-            };
-          }).sort((a, b) => a.cardId - b.cardId);
-        });
-
-        return JSON.stringify({
-          normalizedLoadout: normalized,
-          pItemIds: loadout.pItemIds,
-        });
-      }
-
       if (!loadout.memorySets || !loadout.memorySets[0]) {
         if (loadout.skillCardIdGroups?.[0]) {
           const fixed = fixLoadout(loadout);
@@ -348,21 +331,32 @@ export default function DeckExplorer() {
 
       const maxReplace = Math.min(candidateCards.length, targetSlots.length);
 
-      // ✅ 元構成を常に含める
+      // ✅ 元構成を常に含める（順序無視のキー）
       {
-        const originalKey = getNormalizedLoadoutKey(loadout);
+        const newLoadout = structuredClone(loadout);
+        const sortedSets = newLoadout.memorySets.map((set, gi) => {
+          const cardPairs = set.cards.map((cardId, si) => ({
+            cardId,
+            customization: newLoadout.customizationGroups[gi]?.[si] || {},
+          }));
+          return cardPairs
+            .filter((p) => typeof p.cardId === "number")
+            .sort((a, b) => a.cardId - b.cardId);
+        });
+
+        const originalKey = JSON.stringify({
+          normalizedCardCustomizations: sortedSets,
+          pItemIds: newLoadout.pItemIds,
+        });
+
         if (!seenLoadoutKeys.has(originalKey)) {
           seenLoadoutKeys.add(originalKey);
-
-          const newLoadout = structuredClone(loadout);
           const newConfig = new IdolStageConfig(
             new IdolConfig(newLoadout),
             new StageConfig(stage)
           );
-
           const result = simulate(newConfig, strategy, effectiveNumRuns);
           const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
-
           scored.push({
             result: {
               ...result,
@@ -410,6 +404,7 @@ export default function DeckExplorer() {
               const { groupIndex, slotIndex } = slots[i];
               const { cardId, customization } = cards[i];
 
+              // ✅ 差し替え対象を除いたカードと比較して重複を避ける
               const currentCards = [...newLoadout.memorySets[groupIndex].cards];
               for (let j = 0; j < k; j++) {
                 const { groupIndex: gi, slotIndex: si } = slots[j];
@@ -431,7 +426,22 @@ export default function DeckExplorer() {
             });
             if (overLimit) continue;
 
-            const key = getNormalizedLoadoutKey(newLoadout);
+            // ✅ 順序を無視したカスタマイズ構成による重複検出
+            const sortedSets = newLoadout.memorySets.map((set, gi) => {
+              const cardPairs = set.cards.map((cardId, si) => ({
+                cardId,
+                customization: newLoadout.customizationGroups[gi]?.[si] || {},
+              }));
+              return cardPairs
+                .filter((p) => typeof p.cardId === "number")
+                .sort((a, b) => a.cardId - b.cardId);
+            });
+
+            const key = JSON.stringify({
+              normalizedCardCustomizations: sortedSets,
+              pItemIds: newLoadout.pItemIds,
+            });
+
             if (seenLoadoutKeys.has(key)) continue;
             seenLoadoutKeys.add(key);
 
