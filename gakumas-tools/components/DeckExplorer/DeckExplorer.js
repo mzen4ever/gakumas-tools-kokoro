@@ -94,6 +94,7 @@ export default function DeckExplorer() {
   const [itemCandidates, setItemCandidates] = useState([null, null, null]);
   const [cardCandidates, setCardCandidates] = useState([null]);
   const [cardCustomizationsList, setCardCustomizationsList] = useState([]);
+  const [customizationLimit, setCustomizationLimit] = useState(1);
   const [explorationMode, setExplorationMode] = useState("item");
   const [running, setRunning] = useState(false);
   const [topCombos, setTopCombos] = useState([]);
@@ -166,6 +167,14 @@ export default function DeckExplorer() {
       updated[index] = customizations;
       return updated;
     });
+  }
+
+  function countCustomizations(customizations) {
+    if (!Array.isArray(customizations)) return 0;
+    return [2, 3, 4, 5].reduce((count, index) => {
+      const c = customizations[index];
+      return count + (c && typeof c === "object" && Object.keys(c).length > 0 ? 1 : 0);
+    }, 0);
   }
 
   async function readFromClipboardAndParse() {
@@ -250,7 +259,12 @@ export default function DeckExplorer() {
         await new Promise((r) => setTimeout(r, 0));
       }
     } else if (explorationMode === "card") {
-      const targetSlot = 5;
+      const targetSlots = [
+        { groupIndex: 0, slotIndex: 5 },
+        { groupIndex: 1, slotIndex: 5 },
+      ];
+
+      const seenLoadoutKeys = new Set();
 
       if (!loadout.memorySets || !loadout.memorySets[0]) {
         if (loadout.skillCardIdGroups?.[0]) {
@@ -266,45 +280,84 @@ export default function DeckExplorer() {
         }
       }
 
-      const originalCardId = loadout.memorySets[0].cards?.[targetSlot];
-      const originalCustomization =
-        loadout.customizationGroups?.[0]?.[targetSlot] || [];
+      for (const { groupIndex, slotIndex } of targetSlots) {
+        if (!loadout.memorySets[groupIndex]?.cards) continue;
 
-      const allCandidates = [{ cardId: originalCardId, customization: originalCustomization }];
-      for (let i = 0; i < cardCandidates.length; i++) {
-        const cardId = cardCandidates[i];
-        if (!cardId) continue;
-        const customization = cardCustomizationsList[i] || [];
-        allCandidates.push({ cardId, customization });
-      }
+        const originalCardId = loadout.memorySets[groupIndex].cards[slotIndex];
+        const originalCustomization =
+          loadout.customizationGroups?.[groupIndex]?.[slotIndex] || [];
 
-      for (const { cardId, customization } of allCandidates) {
-        const newLoadout = structuredClone(loadout);
-        if (!newLoadout.memorySets?.[0]?.cards) continue;
+        const allCandidates = [{ cardId: originalCardId, customization: originalCustomization }];
+        for (let i = 0; i < cardCandidates.length; i++) {
+          const cardId = cardCandidates[i];
+          if (!cardId) continue;
+          const customization = cardCustomizationsList[i] || [];
+          allCandidates.push({ cardId, customization });
+        }
 
-        newLoadout.memorySets[0].cards[targetSlot] = cardId;
+        const originalCustomizations = loadout.customizationGroups?.[groupIndex] || [];
+        const beforeCount = countCustomizations(originalCustomizations);
 
-        if (!newLoadout.customizationGroups) newLoadout.customizationGroups = [];
-        if (!newLoadout.customizationGroups[0]) newLoadout.customizationGroups[0] = [];
-        newLoadout.customizationGroups[0][targetSlot] = customization;
+        for (const { cardId, customization } of allCandidates) {
+          const newLoadout = structuredClone(loadout);
 
-        const newConfig = new IdolStageConfig(
-          new IdolConfig(newLoadout),
-          new StageConfig(stage)
-        );
+          if (!newLoadout.memorySets[groupIndex]?.cards) continue;
+          newLoadout.memorySets[groupIndex].cards[slotIndex] = cardId;
 
-        const result = simulate(newConfig, strategy, effectiveNumRuns);
-        const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+          // カスタマイズの初期化とコピー（安全対応版）
+          if (!newLoadout.customizationGroups) {
+            newLoadout.customizationGroups = [];
+          }
+          if (!newLoadout.customizationGroups[groupIndex]) {
+            newLoadout.customizationGroups[groupIndex] = [];
+          }
 
-        scored.push({
-          result: {
-            ...result,
-            loadout: newLoadout,
-          },
-          avg,
-        });
+          const originalGroup = loadout.customizationGroups?.[groupIndex] || [];
+          for (let i = 0; i < 6; i++) {
+            const orig = originalGroup[i];
+            if (orig && typeof orig === "object") {
+              newLoadout.customizationGroups[groupIndex][i] = structuredClone(orig);
+            } else {
+              newLoadout.customizationGroups[groupIndex][i] = {};
+            }
+          }
 
-        await new Promise((r) => setTimeout(r, 0));
+          // 差し替えスロットのカスタマイズを更新
+          newLoadout.customizationGroups[groupIndex][slotIndex] = structuredClone(customization);
+
+          // カスタマイズ数の判定（スロット2～5）
+          const afterCount = countCustomizations(newLoadout.customizationGroups[groupIndex]);
+          if (afterCount > customizationLimit) continue;
+          if (afterCount < beforeCount) continue;
+
+          // 🔒 重複チェック用キー生成
+          const key = JSON.stringify({
+            memorySets: newLoadout.memorySets,
+            customizationGroups: newLoadout.customizationGroups,
+            pItemIds: newLoadout.pItemIds,
+          });
+
+          if (seenLoadoutKeys.has(key)) continue;
+          seenLoadoutKeys.add(key);
+
+          const newConfig = new IdolStageConfig(
+            new IdolConfig(newLoadout),
+            new StageConfig(stage)
+          );
+
+          const result = simulate(newConfig, strategy, effectiveNumRuns);
+          const avg = result.scores.reduce((sum, v) => sum + v, 0) / result.scores.length;
+
+          scored.push({
+            result: {
+              ...result,
+              loadout: newLoadout,
+            },
+            avg,
+          });
+
+          await new Promise((r) => setTimeout(r, 0));
+        }
       }
     } else if (explorationMode === "both") {
       const targetSlot = 5;
@@ -532,6 +585,21 @@ export default function DeckExplorer() {
           </select>
         </div>
 
+        <div className={styles.supportBonusInput}>
+          <label>カスタマイズ最大数（1セットあたり）</label>
+          <select
+            value={customizationLimit}
+            onChange={(e) => setCustomizationLimit(Number(e.target.value))}
+            style={{ padding: "4px" }}
+          >
+            {[1, 2].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <Button style="blue" onClick={runSimulation} disabled={running}>
           {running ? <Loader /> : t("simulate")}
         </Button>
@@ -613,28 +681,35 @@ export default function DeckExplorer() {
               <>
                 <h4>カード候補の上位</h4>
                 <div className={styles.comboRow}>
-                  {topCombos
-                    .filter((entry) => entry.result?.loadout?.memorySets?.[0]?.cards?.[5] != null)
-                    .map((entry, idx) => {
-                      const cardId = entry.result.loadout.memorySets[0].cards[5];
-                      const customization = entry.result.loadout.customizationGroups?.[0]?.[5] || [];
+                  {topCombos.map((entry, idx) => {
+                    const loadout = entry.result?.loadout;
+                    const memorySets = loadout?.memorySets || [];
+                    const customizationGroups = loadout?.customizationGroups || [];
 
-                      return (
-                        <div key={`card-${idx}`} className={styles.comboGroup}>
-                          <div className={styles.comboIcons}>
-                            <EntityIcon
-                              type={EntityTypes.SKILL_CARD}
-                              id={cardId}
-                              style="medium"
-                              customizations={customization}
-                            />
+                    return (
+                      <div key={`card-${idx}`} className={styles.comboGroup}>
+                        {memorySets.map((cardGroup, groupIndex) => (
+                          <div key={`group-${groupIndex}`} style={{ display: "flex", gap: "4px", marginBottom: "4px" }}>
+                            {cardGroup.cards.map((cardId, slotIndex) => {
+                              const customization = customizationGroups?.[groupIndex]?.[slotIndex] || [];
+                              return (
+                                <EntityIcon
+                                  key={slotIndex}
+                                  type={EntityTypes.SKILL_CARD}
+                                  id={cardId}
+                                  style="medium"
+                                  customizations={customization}
+                                />
+                              );
+                            })}
                           </div>
-                          <div className={styles.comboScore}>
-                            スコア: {Math.round(entry.avg)}
-                          </div>
+                        ))}
+                        <div className={styles.comboScore}>
+                          スコア: {Math.round(entry.avg)}
                         </div>
-                      );
-                    })}
+                      </div>
+                    );
+                  })}
                 </div>
               </>
             )}
