@@ -29,11 +29,11 @@ export const TOOLS = {
     path: "/memories",
     pinnable: true,
   }, */
-  simulator: {
+/*   simulator: {
     icon: <FaTrophy />,
     path: "/simulator",
     pinnable: true,
-  },
+  }, */
 /*   rehearsal: {
     icon: <FaChartSimple />,
     path: "/rehearsal",
