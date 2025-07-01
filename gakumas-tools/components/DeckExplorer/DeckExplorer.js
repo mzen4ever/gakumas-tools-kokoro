@@ -96,6 +96,7 @@ export default function DeckExplorer() {
   const [cardCustomizationsList, setCardCustomizationsList] = useState([[], [], []]);
   const [customizationLimit, setCustomizationLimit] = useState(1);
   const [explorationMode, setExplorationMode] = useState("item");
+  const [initialCombos, setInitialCombos] = useState([]);
   const [running, setRunning] = useState(false);
   const [topCombos, setTopCombos] = useState([]);
   const [savedLoadout, setSavedLoadout] = useState(null);
@@ -328,12 +329,27 @@ export default function DeckExplorer() {
         await new Promise((r) => setTimeout(r, 0));
       }
     } else if (explorationMode === "card") {
-      const targetSlots = [
-        { groupIndex: 0, slotIndex: 4 },
-        { groupIndex: 0, slotIndex: 5 },
-        { groupIndex: 1, slotIndex: 4 },
-        { groupIndex: 1, slotIndex: 5 },
-      ];
+      // ターゲットスロット取得
+      if (!loadout.memorySets || !Array.isArray(loadout.memorySets)) {
+        if (loadout.skillCardIdGroups?.[0]) {
+          const fixed = fixLoadout(loadout);
+          setLoadout(fixed);
+          setRunning(false);
+          setTimeout(() => runSimulation(), 0);
+          return;
+        } else {
+          alert("カード探索を行うには memorySets が必要です。");
+          setRunning(false);
+          return;
+        }
+      }
+
+      const targetSlots = [];
+      for (let groupIndex = 0; groupIndex < loadout.memorySets.length; groupIndex++) {
+        for (let slotIndex = 3; slotIndex <= 5; slotIndex++) {
+          targetSlots.push({ groupIndex, slotIndex });
+        }
+      }
 
       const seenLoadoutKeys = new Set();
 
@@ -505,81 +521,56 @@ export default function DeckExplorer() {
           }
         }
       }
-    } else if (explorationMode === "both") {
-      const targetSlot = 5;
-
-      if (!loadout.memorySets || !loadout.memorySets[0]) {
-        if (loadout.skillCardIdGroups?.[0]) {
-          const fixed = fixLoadout(loadout);
-          setLoadout(fixed);
-          setRunning(false);
-          setTimeout(() => runSimulation(), 0);
-          return;
-        } else {
-          alert("両方探索を行うには memorySets[0] が必要です。");
-          setRunning(false);
-          return;
-        }
-      }
-
-      const originalCardId = loadout.memorySets[0].cards?.[targetSlot];
-      const originalCustomization =
-        loadout.customizationGroups?.[0]?.[targetSlot] || [];
-
-      const allCandidates = [{ cardId: originalCardId, customization: originalCustomization }];
-      for (let i = 0; i < cardCandidates.length; i++) {
-        const cardId = cardCandidates[i];
-        if (!cardId) continue;
-        const customization = cardCustomizationsList[i] || [];
-        allCandidates.push({ cardId, customization });
-      }
-
-      for (const { cardId, customization } of allCandidates) {
-        const newLoadoutBase = structuredClone(loadout);
-        newLoadoutBase.memorySets[0].cards[targetSlot] = cardId;
-
-        if (!newLoadoutBase.customizationGroups) newLoadoutBase.customizationGroups = [];
-        if (!newLoadoutBase.customizationGroups[0]) newLoadoutBase.customizationGroups[0] = [];
-        newLoadoutBase.customizationGroups[0][targetSlot] = customization;
-
-        const itemCombos = generateItemCombos(loadout.pItemIds, itemCandidates);
-        const combos = itemCombos.length <= 64 ? itemCombos : itemCombos.slice(0, 64);
-
-        for (const itemCombo of combos) {
-          const newLoadout = structuredClone(newLoadoutBase);
-          newLoadout.pItemIds = itemCombo;
-
-          const newConfig = new IdolStageConfig(
-            new IdolConfig(newLoadout),
-            new StageConfig(stage)
-          );
-
-          const { result, avg } = await runSimulationWithWorkers(
-            workersRef.current,
-            newConfig,
-            strategy,
-            effectiveNumRuns
-          );
-
-          scored.push({
-            result: {
-              ...result,
-              loadout: newLoadout,
-            },
-            avg,
-          });
-
-          await new Promise((r) => setTimeout(r, 0));
-        }
-      }
     }
 
     scored.sort((a, b) => b.avg - a.avg);
     setSimulatorData(scored[0]?.result || null);
     setTopCombos(scored.slice(0, 5));
+    setInitialCombos(scored); // ✅ 元の候補群を保存
     setRunning(false);
     console.timeEnd("simulation");
     console.log(`カード探索で実行された構成数: ${scored.length}`);
+  }
+
+  async function runTopCombosAgain() {
+    if (initialCombos.length === 0) {
+      alert("前回の候補がありません。まず通常のシミュレーションを実行してください。");
+      return;
+    }
+
+    setRunning(true);
+    console.time("resimulation");
+
+    const reevaluated = [];
+
+    const maxAvg = initialCombos[0].avg;
+    const threshold = maxAvg * 0.9;
+    const selectedCombos = initialCombos.filter((entry) => entry.avg >= threshold);
+
+    for (const entry of selectedCombos) {
+      const newLoadout = entry.result?.loadout || loadout;
+      const newConfig = new IdolStageConfig(
+        new IdolConfig(newLoadout),
+        new StageConfig(stage)
+      );
+
+      const { result, avg } = await runSimulationWithWorkers(
+        workersRef.current,
+        newConfig,
+        strategy,
+        numRuns
+      );
+
+      reevaluated.push({ result: { ...result, loadout: newLoadout }, avg });
+      await new Promise((r) => setTimeout(r, 0));
+    }
+
+    reevaluated.sort((a, b) => b.avg - a.avg);
+    setSimulatorData(reevaluated[0]?.result || null);
+    setTopCombos(reevaluated);
+    setRunning(false);
+    console.timeEnd("resimulation");
+    console.log(`カード探索で実行された構成数: ${reevaluated.length}`);
   }
 
   function saveCurrentLoadout() {
@@ -752,7 +743,6 @@ export default function DeckExplorer() {
           >
             <option value="item">アイテム</option>
             <option value="card">カード</option>
-            <option value="both">両方</option>
           </select>
         </div>
 
@@ -774,6 +764,10 @@ export default function DeckExplorer() {
         <Button style="blue" onClick={runSimulation} disabled={running}>
           {running ? <Loader /> : t("simulate")}
         </Button>
+
+        <Button style="blue" onClick={runTopCombosAgain} disabled={running || topCombos.length === 0}>
+          上位10%を再試行
+        </Button> 
 
         <div style={{ textAlign: "right", marginTop: "4px" }}>
           <a
@@ -878,54 +872,6 @@ export default function DeckExplorer() {
                       </div>
                     );
                   })}
-                </div>
-              </>
-            )}
-
-            {/* 両方候補の上位 */}
-            {explorationMode === "both" && (
-              <>
-                <h4>両方候補の上位</h4>
-                <div className={styles.comboRow}>
-                  {topCombos
-                    .filter(
-                      (entry) =>
-                        entry?.result?.loadout?.memorySets?.[0]?.cards?.[5] != null &&
-                        Array.isArray(entry?.result?.loadout?.pItemIds) &&
-                        entry.result.loadout.pItemIds.length >= 2
-                    )
-                    .map((entry, idx) => {
-                      const loadout = entry.result.loadout;
-                      const cardId = loadout.memorySets[0].cards[5];
-                      const customization = loadout.customizationGroups?.[0]?.[5] || [];
-                      const itemIds = loadout.pItemIds.slice(1); // slot 1 and 2
-
-                      return (
-                        <div key={`both-${idx}`} className={styles.comboGroup}>
-                          <div className={styles.comboIcons}>
-                            <EntityIcon
-                              type={EntityTypes.SKILL_CARD}
-                              id={cardId}
-                              style="medium"
-                              customizations={customization}
-                            />
-                            {itemIds.map((id, i) =>
-                              id ? (
-                                <EntityIcon
-                                  key={`item-${i}`}
-                                  type={EntityTypes.P_ITEM}
-                                  id={id}
-                                  style="medium"
-                                />
-                              ) : null
-                            )}
-                          </div>
-                          <div className={styles.comboScore}>
-                            スコア: {Math.round(entry.avg)}
-                          </div>
-                        </div>
-                      );
-                    })}
                 </div>
               </>
             )}
