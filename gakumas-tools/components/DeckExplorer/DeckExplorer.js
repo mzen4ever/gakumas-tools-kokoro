@@ -680,21 +680,6 @@ export default function DeckExplorer() {
       <div className={styles.configurator}>
         <StageSelect />
 
-        <div className={styles.supportBonusInput}>
-          <label>試行回数</label>
-            <select
-              value={numRuns}
-              onChange={(e) => setNumRuns(Number(e.target.value))}
-              style={{ padding: "4px" }}
-            >
-              {[20, 50, 100, 200, 400, 1000, 2000].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-        </div>
-
         {stage.type === "event" ? (
           t("enterPercents")
         ) : (
@@ -818,6 +803,21 @@ export default function DeckExplorer() {
             <option value="item">アイテム</option>
             <option value="card">カード</option>
           </select>
+        </div>
+        
+        <div className={styles.supportBonusInput}>
+          <label>試行回数</label>
+            <select
+              value={numRuns}
+              onChange={(e) => setNumRuns(Number(e.target.value))}
+              style={{ padding: "4px" }}
+            >
+              {[20, 50, 100, 200, 400, 1000, 2000].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
         </div>
 
         <div className={styles.supportBonusInput}>
