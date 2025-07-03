@@ -100,6 +100,7 @@ export default function DeckExplorer() {
   const [comboPoints, setComboPoints] = useState(new Map()); // 組み合わせが持つポイント
   const [sortByPoints, setSortByPoints] = useState(false); // ポイント順にソート
   const [comboTrialCounts, setComboTrialCounts] = useState(new Map()); // 累計試行回数
+  const [retrySetCount, setRetrySetCount] = useState(1); // 再試行のマルチセット回数
   const [targetSlotCount, setTargetSlotCount] = useState(2); // 入替先スロット候補
   const [running, setRunning] = useState(false);
   const [topCombos, setTopCombos] = useState([]);
@@ -368,57 +369,46 @@ export default function DeckExplorer() {
         await new Promise((r) => setTimeout(r, 0));
       }
     } else if (explorationMode === "card") {
-      // メモリーセット確認
-      if (!loadout.memorySets || !Array.isArray(loadout.memorySets)) {
-        if (loadout.skillCardIdGroups?.[0]) {
-          const fixed = fixLoadout(loadout);
-          setLoadout(fixed);
-          setRunning(false);
-          setTimeout(() => runSimulation(), 0);
-          return;
-        } else {
-          alert("カード探索を行うには memorySets が必要です。");
-          setRunning(false);
-          return;
-        }
+    // --- memorySets の存在チェックと修復処理 ---
+    if (!loadout.memorySets || !Array.isArray(loadout.memorySets) || !loadout.memorySets[0]) {
+      if (loadout.skillCardIdGroups?.[0]) {
+        const fixed = fixLoadout(loadout);
+        setLoadout(fixed);
+        setRunning(false);
+        setTimeout(() => runSimulation(), 0);
+        return;
+      } else {
+        alert("カード探索を行うには memorySets が必要です。");
+        setRunning(false);
+        return;
       }
-      // ターゲットスロット設定
-      const targetSlots = [];
-      const selectedIndices = [2, 3, 4, 5].slice(-targetSlotCount);
+    }
 
-      for (let groupIndex = 0; groupIndex < loadout.memorySets.length; groupIndex++) {
-        for (const slotIndex of selectedIndices) {
-          targetSlots.push({ groupIndex, slotIndex });
-        }
+    // --- ターゲットスロット設定 ---
+    const selectedIndices = [2, 3, 4, 5].slice(-targetSlotCount);
+    const targetSlots = [];
+
+    for (let groupIndex = 0; groupIndex < loadout.memorySets.length; groupIndex++) {
+      for (const slotIndex of selectedIndices) {
+        targetSlots.push({ groupIndex, slotIndex });
       }
+    }
 
-      const seenLoadoutKeys = new Set();
+    // --- 初期化 ---
+    const seenLoadoutKeys = new Set();
 
-      if (!loadout.memorySets || !loadout.memorySets[0]) {
-        if (loadout.skillCardIdGroups?.[0]) {
-          const fixed = fixLoadout(loadout);
-          setLoadout(fixed);
-          setRunning(false);
-          setTimeout(() => runSimulation(), 0);
-          return;
-        } else {
-          alert("カード探索を行うには memorySets[0] が必要です。");
-          setRunning(false);
-          return;
-        }
+    // --- 候補カードの整形 ---
+    const candidateCards = [];
+    for (let i = 0; i < cardCandidates.length; i++) {
+      if (cardCandidates[i]) {
+        candidateCards.push({
+          cardId: cardCandidates[i],
+          customization: cardCustomizationsList[i] || [],
+        });
       }
+    }
 
-      const candidateCards = [];
-      for (let i = 0; i < cardCandidates.length; i++) {
-        if (cardCandidates[i]) {
-          candidateCards.push({
-            cardId: cardCandidates[i],
-            customization: cardCustomizationsList[i] || [],
-          });
-        }
-      }
-
-      const maxReplace = Math.min(candidateCards.length, targetSlots.length);
+    const maxReplace = Math.min(candidateCards.length, targetSlots.length);
 
       // 元構成を常に含める（順序無視のキー）
       {
@@ -515,10 +505,11 @@ export default function DeckExplorer() {
 
             if (skip) continue;
 
-            const overLimit = newLoadout.customizationGroups.some((group) => {
-              return countCustomizations(group) > customizationLimit;
-            });
-            if (overLimit) continue;
+          const overLimit = newLoadout.customizationGroups.some((group, i) => {
+            const originalCount = countCustomizations(loadout.customizationGroups?.[i] || []);
+            return countCustomizations(group) > originalCount;
+          });
+          if (overLimit) continue;
 
             // 順序を無視したカスタマイズ構成による重複検出
             const sortedSets = newLoadout.memorySets.map((set, gi) => {
@@ -585,74 +576,89 @@ export default function DeckExplorer() {
     console.time("resimulation");
 
     const reevaluated = [];
+    const seenKeys = new Set();
 
-    // 上位スコアから再試行対象を選出（最低10%を含める）
     const maxAvg = initialCombos[0].avg;
     const threshold = maxAvg * 0.9;
     const sorted = [...initialCombos].sort((a, b) => b.avg - a.avg);
     const requiredCount = Math.ceil(initialCombos.length * 0.1);
 
-    // 有効な loadout を持つものだけ対象にする
     const selectedCombos = sorted.filter(
       (entry) => entry.avg >= threshold && entry.result?.loadout
     );
 
-    // 不足分をスコア順で追加（安全な loadout を持つものだけ）
     let i = 0;
     while (selectedCombos.length < requiredCount && i < sorted.length) {
       const next = sorted[i];
       i++;
-      if (
-        next?.result?.loadout &&
-        !selectedCombos.includes(next)
-      ) {
+      if (next?.result?.loadout && !selectedCombos.includes(next)) {
         selectedCombos.push(next);
       }
     }
 
-    for (const entry of selectedCombos) {
-      const newLoadout = entry.result?.loadout || loadout;
-      const newConfig = new IdolStageConfig(
-        new IdolConfig(newLoadout),
-        new StageConfig(stage)
-      );
+    for (let setIndex = 0; setIndex < retrySetCount; setIndex++) {
+      const currentSet = [];
 
-      const { result, avg } = await runSimulationWithWorkers(
-        workersRef.current,
-        newConfig,
-        strategy,
-        numRuns
-      );
+      for (let index = 0; index < selectedCombos.length; index++) {
+        const entry = selectedCombos[index];
+        const newLoadout = entry.result?.loadout || loadout;
+        const newConfig = new IdolStageConfig(
+          new IdolConfig(newLoadout),
+          new StageConfig(stage)
+        );
 
-      reevaluated.push({ result: { ...result, loadout: newLoadout }, avg });
-      await new Promise((r) => setTimeout(r, 0));
+        const { result } = await runSimulationWithWorkers(
+          workersRef.current,
+          newConfig,
+          strategy,
+          numRuns
+        );
+
+        const scores = result?.scores || [];
+        const avg = scores.length
+          ? scores.reduce((sum, v) => sum + v, 0) / scores.length
+          : 0;
+
+        const key = getLoadoutKey(newLoadout);
+        seenKeys.add(key);
+
+        const item = {
+          result: { ...result, loadout: newLoadout },
+          avg,
+          key,
+        };
+
+        reevaluated.push(item);
+        currentSet.push(item);
+
+        // 累計試行回数を加算（即時でOK）
+        setComboTrialCounts((prev) => {
+          const updated = new Map(prev);
+          updated.set(key, (updated.get(key) || 0) + numRuns);
+          return updated;
+        });
+
+        await new Promise((r) => setTimeout(r, 0));
+      }
+
+      // セット単位でポイント加算（スコア順に並べ替えて順位に応じて加点）
+      currentSet.sort((a, b) => b.avg - a.avg);
+      setComboPoints((prev) => {
+        const updated = new Map(prev);
+        currentSet.forEach((entry, index) => {
+          const points = Math.max(0, 20 - index);
+          updated.set(entry.key, (updated.get(entry.key) || 0) + points);
+        });
+        return updated;
+      });
     }
 
-    // 組み合わせにポイント加算
-    setComboPoints((prev) => {
-      const updated = new Map(prev);
-      reevaluated.forEach((entry, index) => {
-        const key = getLoadoutKey(entry.result.loadout);
-        const points = Math.max(0, 20 - index);
-        updated.set(key, (updated.get(key) || 0) + points);
-      });
-      return updated;
-    });
-
-    // 累計試行回数加算
-    setComboTrialCounts((prev) => {
-      const updated = new Map(prev);
-      reevaluated.forEach((entry) => {
-        const key = getLoadoutKey(entry.result.loadout);
-        updated.set(key, (updated.get(key) || 0) + numRuns);
-      });
-      return updated;
-    });
-
+    // 最終並び替えと表示
     reevaluated.sort((a, b) => b.avg - a.avg);
     const top5 = reevaluated.slice(0, 5);
     setSimulatorData(reevaluated[0]?.result || null);
-    setTopCombos(top5); // 上位5件のみ表示
+    setTopCombos(top5);
+
     setRunning(false);
     console.timeEnd("resimulation");
     console.log(`カード探索で実行された構成数: ${reevaluated.length}`);
@@ -798,9 +804,9 @@ export default function DeckExplorer() {
                 <p>② カード候補：検証したいカードをセットするスロット。</p>
                 <p>③ 探索モード：「アイテム」と「カード」の2種の探索モードを設定。</p>
                 <p>④ 試行回数：シミュの回転数の設定。各組み合わせに対して適用される。</p>
-                <p>⑤ カスタム最大数：メモリー1枚あたりのカスタム最大数を設定。</p>
+                <p>⑤ 再試行セット数：再試行をセットで回す回数を設定。</p>
                 <p>⑥ 差替えスロット数：メモリー1枚あたりの差替えカード数を設定。</p>
-                <p>⑦ ポイント順：カード探索モードの表示をポイント順位ソート。</p>
+                <p>⑦ ポイント順で表示：カード探索モードの結果表示をポイント順でソート。</p>
               </div>
             </details>
 
@@ -823,15 +829,17 @@ export default function DeckExplorer() {
                 <p>最適デッキを探索するモード。</p>
                 <p>① デッキを組む（risシミュと同様）。</p>
                 <p>② カード候補にカスタム等を含めたカードをセット。</p>
-                <p>③ 探索モードを「カード」に設定。試行回数・差替えスロット数も任意の数に設定。</p>
+                <p>③ 探索モードを「カード」に設定。試行回数も任意の数に設定。</p>
                 <p>※差替えスロットは右から数える（左から1・2スロット目はアイドル固有とサポカを考慮し差替え対象外。1・2スロット目にカスタムされた通常カードを設定する場合はカスタム数に注意）。</p>
                 <p>④ 「実行」ボタンを押下。</p>
                 <p>⑤ スコア（平均）が高い順に最大5組の結果が表示される。</p>
-                <p>⑥ 「上位10％を再試行」ボタンを押下。実行するたびに各組み合わせに対しポイントが加算される。</p>
-                <p>※ポイントについて：スコアが高く出やすい組み合わせを評価するための指標。ポイントが高いほど高いスコアがでやすい。</p>
+                <p>⑥ 「上位10％を再試行」ボタンを押下。実行するたびに各組み合わせに対しポイントが加算される。この時「再試行セット数」を設定すると指定したセット数で実行する。</p>
+                <p>※ポイントについて：スコアが高く出やすい組み合わせを評価するための指標。ポイントが高いほどスコアがでやすい組み合わせ。</p>
                 <p>⑦ 「ポイント順」にチェックを入れて、ポイントの高い組み合わせを確認する。「risシミュ」をクリックするとその組み合わせでrisシミュに遷移する。納得する結果が得られたら終了。</p>
                 <p className={styles.warning}>
-                  ※ カード候補・差替えスロット数・試行回数を増加させると重くなるので、④の実行時は試行回数を200程度に制限推奨。
+                  ・カード候補／試行回数／再試行セット数／差替えスロット数を増加させると重くなるので、④実行時は試行回数を200程度に制限推奨。<br />
+                  ・カスタム数はセットされたデッキの各メモリーセット毎に合わせて自動的に設定される。<br />
+                  ・ポイントは再度「実行」ボタンを押下したタイミングでリセットされる。
                 </p>
                 <img src="/deckexplorer/04.png" alt="カード探索の結果" />
               </div>
@@ -840,8 +848,9 @@ export default function DeckExplorer() {
         </details>
 
         <div className={styles.supportBonusInput}>
-          <label>探索モード</label>
+          <label htmlFor="mode">探索モード</label>
           <select
+            id="mode"
             value={explorationMode}
             onChange={(e) => setExplorationMode(e.target.value)}
             style={{ padding: "4px" }}
@@ -850,30 +859,16 @@ export default function DeckExplorer() {
             <option value="card">カード</option>
           </select>
         </div>
-        
-        <div className={styles.supportBonusInput}>
-          <label>試行回数</label>
-            <select
-              value={numRuns}
-              onChange={(e) => setNumRuns(Number(e.target.value))}
-              style={{ padding: "4px" }}
-            >
-              {[20, 50, 100, 200, 400, 1000, 2000].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-        </div>
 
         <div className={styles.supportBonusInput}>
-          <label>カスタム最大数</label>
+          <label htmlFor="numRuns">試行回数</label>
           <select
-            value={customizationLimit}
-            onChange={(e) => setCustomizationLimit(Number(e.target.value))}
+            id="numRuns"
+            value={numRuns}
+            onChange={(e) => setNumRuns(Number(e.target.value))}
             style={{ padding: "4px" }}
           >
-            {[1, 2].map((n) => (
+            {[20, 50, 100, 200, 400, 1000, 2000].map((n) => (
               <option key={n} value={n}>
                 {n}
               </option>
@@ -882,8 +877,24 @@ export default function DeckExplorer() {
         </div>
 
         <div className={styles.supportBonusInput}>
-          <label>差替えスロット数</label>
+          <label>再試行セット数</label>
           <select
+            value={retrySetCount}
+            onChange={(e) => setRetrySetCount(Number(e.target.value))}
+            style={{ padding: "4px" }}
+          >
+            {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className={styles.supportBonusInput}>
+          <label htmlFor="targetSlotCount">差替えスロット数</label>
+          <select
+            id="targetSlotCount"
             value={targetSlotCount}
             onChange={(e) => setTargetSlotCount(Number(e.target.value))}
             style={{ padding: "4px" }}
