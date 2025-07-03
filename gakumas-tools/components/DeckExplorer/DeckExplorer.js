@@ -127,8 +127,19 @@ export default function DeckExplorer() {
     return list;
   }, [topCombos, sortByPoints, comboPoints]);
 
-  const deckExplorerUrl = useMemo(() => getDeckExplorerUrl(loadout), [loadout]);
-  const simulatorUrl = useMemo(() => getSimulatorUrl(loadout), [loadout]);
+  const deckExplorerUrl = useMemo(() => {
+    if (!loadout || typeof loadout !== "object" || loadout.stageId == null) {
+      return "";
+    }
+    return getDeckExplorerUrl(loadout);
+  }, [loadout]);
+
+  const simulatorUrl = useMemo(() => {
+    if (!loadout || typeof loadout !== "object" || loadout.stageId == null) {
+      return "";
+    }
+    return getSimulatorUrl(loadout);
+  }, [loadout]);
 
   const { pItemIndications, skillCardIndicationGroups } = getIndications(
     config,
@@ -775,21 +786,56 @@ export default function DeckExplorer() {
 
         <details>
           <summary style={{ cursor: "pointer", fontWeight: "bold" }}>
-            ◆探索モードの仕様（クリックで展開）◆
+            ◆各モードの使い方（クリックで展開）◆
           </summary>
-          <div style={{ paddingLeft: "1em", marginTop: "0.5em" }}>
-            <p>カード候補に登録したカードは、指定されたスロットに差し替え候補として使用されます。</p>
-            <ul>
-              <li>差し替え対象スロットはメモリーセット1・2のスロット5・6です。</li>
-              <li>カード候補は複数指定可能で、カスタマイズも反映されます。</li>
-              <li>1スロットのみの差し替えに加え、複数スロットを同時に差し替える組み合わせも自動的に探索されます。</li>
-              <li><u>カスタマイズ最大数（1セットあたり）を超える構成は除外されます。</u></li>
-            </ul>
-            <p><u>メモリーセットの1・2スロット目は固定されています。どちらかにアイドル固有カード、もしくはサポカを設定してください（ここにセットしたカードはカスタマイズ数の計算から除外されます）。</u></p>
-            <p>スコアが高かった構成が「カード候補の上位」として表示されます。</p>
-            <p style={{ color: "red", fontWeight: "bold", marginTop: "1em" }}>
-              ※ 試行回数を増やすと非常に重くなります。200設定のまま何回か回して傾向を掴む使い方をおすすめします。
-            </p>
+          <div className={styles.modeSection}>
+            <details>
+              <summary>画面の説明</summary>
+              <div>
+                <img src="/deckexplorer/00.png" alt="画面の説明①" />
+                <img src="/deckexplorer/01.png" alt="画面の説明②" />
+                <p>① アイテム候補：検証したいアイテムをセットするスロット。</p>
+                <p>② カード候補：検証したいカードをセットするスロット。</p>
+                <p>③ 探索モード：「アイテム」と「カード」の2種の探索モードを設定。</p>
+                <p>④ 試行回数：シミュの回転数の設定。各組み合わせに対して適用される。</p>
+                <p>⑤ カスタム最大数：メモリー1枚あたりのカスタム最大数を設定。</p>
+                <p>⑥ 差替えスロット数：メモリー1枚あたりの差替えカード数を設定。</p>
+                <p>⑦ ポイント順：カード探索モードの表示をポイント順位ソート。</p>
+              </div>
+            </details>
+
+            <details style={{ marginTop: "1em" }}>
+              <summary>アイテム探索モード</summary>
+              <div>
+                <p>設定したデッキの最適アイテムを探索するモード。</p>
+                <p>① デッキを組む（risシミュと同様）。</p>
+                <p>② アイテム候補にアイテムをセット。</p>
+                <p>③ 探索モードを「アイテム」に設定。試行回数も任意の数に設定。</p>
+                <p>④ 「実行」ボタンを押下。</p>
+                <p>⑤ スコア（平均）が高い順に最大5組の結果が表示される。</p>
+                <img src="/deckexplorer/02.png" alt="アイテム探索の結果" />
+              </div>
+            </details>
+
+            <details style={{ marginTop: "1em" }}>
+              <summary>カード探索モード</summary>
+              <div>
+                <p>最適デッキを探索するモード。</p>
+                <p>① デッキを組む（risシミュと同様）。</p>
+                <p>② カード候補にカスタム等を含めたカードをセット。</p>
+                <p>③ 探索モードを「カード」に設定。試行回数・差替えスロット数も任意の数に設定。</p>
+                <p>※差替えスロットは右から数える（左から1・2スロット目はアイドル固有とサポカを考慮し差替え対象外。1・2スロット目にカスタムされた通常カードを設定する場合はカスタム数に注意）。</p>
+                <p>④ 「実行」ボタンを押下。</p>
+                <p>⑤ スコア（平均）が高い順に最大5組の結果が表示される。</p>
+                <p>⑥ 「上位10％を再試行」ボタンを押下。実行するたびに各組み合わせに対しポイントが加算される。</p>
+                <p>※ポイントについて：スコアが高く出やすい組み合わせを評価するための指標。ポイントが高いほど高いスコアがでやすい。</p>
+                <p>⑦ 「ポイント順」にチェックを入れて、ポイントの高い組み合わせを確認する。「risシミュ」をクリックするとその組み合わせでrisシミュに遷移する。納得する結果が得られたら終了。</p>
+                <p className={styles.warning}>
+                  ※ カード候補・差替えスロット数・試行回数を増加させると重くなるので、④の実行時は試行回数を200程度に制限推奨。
+                </p>
+                <img src="/deckexplorer/04.png" alt="カード探索の結果" />
+              </div>
+            </details>
           </div>
         </details>
 
@@ -821,7 +867,7 @@ export default function DeckExplorer() {
         </div>
 
         <div className={styles.supportBonusInput}>
-          <label>カスタマイズ最大数（1セットあたり）</label>
+          <label>カスタム最大数</label>
           <select
             value={customizationLimit}
             onChange={(e) => setCustomizationLimit(Number(e.target.value))}
@@ -836,7 +882,7 @@ export default function DeckExplorer() {
         </div>
 
         <div className={styles.supportBonusInput}>
-          <label>差し替えスロット数</label>
+          <label>差替えスロット数</label>
           <select
             value={targetSlotCount}
             onChange={(e) => setTargetSlotCount(Number(e.target.value))}
@@ -888,10 +934,10 @@ export default function DeckExplorer() {
 
         <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
           <Button style="gray" onClick={saveCurrentLoadout}>
-            ローカル保存
+            一時保存
           </Button>
           <Button style="gray" onClick={loadSavedLoadout}>
-            ローカル読込
+            一時読込
           </Button>
           <Button
             style="gray"
@@ -979,12 +1025,25 @@ export default function DeckExplorer() {
                             const key = getLoadoutKey(entry.result.loadout);
                             const point = comboPoints.get(key) || 0;
                             const trials = comboTrialCounts.get(key) || numRuns;
+                            const loadout = entry.result?.loadout;
+                            const url = loadout && typeof loadout === "object" && loadout.stageId != null
+                              ? getSimulatorUrl(loadout)
+                              : "";
 
                             return (
                               <>
+                                {/* 各行に全角スペースあり */}
                                 スコア: {Math.round(entry.avg)}　
                                 ポイント: {point}　
-                                累計試行回数: {trials}
+                                累計試行回数: {trials}　
+                                <a
+                                  href={url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={styles.simulatorLink}
+                                >
+                                  risシミュ
+                                </a>
                               </>
                             );
                           })()}
