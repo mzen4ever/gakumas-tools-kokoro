@@ -26,6 +26,9 @@ import StageSkillCards from "@/components/StageSkillCards";
 import StageSelect from "@/components/StageSelect";
 import EntityIcon from "@/components/EntityIcon";
 
+import { SkillCards } from "gakumas-data";
+import { getBaseId } from "gakumas-engine/utils";
+
 import LoadoutContext from "@/contexts/LoadoutContext";
 import WorkspaceContext from "@/contexts/WorkspaceContext";
 
@@ -457,6 +460,24 @@ export default function DeckExplorer() {
 
         for (const slots of slotCombos) {
           for (const cards of cardPerms) {
+              const baseIds = new Set();
+          let hasDuplicateUnique = false;
+
+          for (const { cardId } of cards) {
+            const card = SkillCards.getById(cardId);
+            if (!card) continue;
+
+            if (card.unique) {
+              const baseId = getBaseId(card);
+              if (baseIds.has(baseId)) {
+                hasDuplicateUnique = true;
+                break;
+              }
+              baseIds.add(baseId);
+            }
+          }
+
+          if (hasDuplicateUnique) continue; // スキップ
             const newLoadout = structuredClone(loadout);
 
             if (!newLoadout.customizationGroups) newLoadout.customizationGroups = [];
