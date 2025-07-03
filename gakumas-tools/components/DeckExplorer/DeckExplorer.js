@@ -210,6 +210,41 @@ export default function DeckExplorer() {
     }, 0);
   }
 
+  function hasDuplicateUniqueCardsAcrossLoadout(loadout, replacementCards, replacementSlots) {
+    const baseIds = new Set();
+
+    // 既存構成の非置換カードをチェック
+    for (let gi = 0; gi < loadout.memorySets.length; gi++) {
+      const cards = loadout.memorySets[gi]?.cards || [];
+      for (let si = 0; si < cards.length; si++) {
+        const isReplacing = replacementSlots.some(
+          ({ groupIndex, slotIndex }) => groupIndex === gi && slotIndex === si
+        );
+        if (isReplacing) continue;
+
+        const cardId = cards[si];
+        const card = SkillCards.getById(cardId);
+        if (card?.unique) {
+          const baseId = getBaseId(card);
+          if (baseIds.has(baseId)) return true;
+          baseIds.add(baseId);
+        }
+      }
+    }
+
+    // 差し替えカードをチェック
+    for (const { cardId } of replacementCards) {
+      const card = SkillCards.getById(cardId);
+      if (card?.unique) {
+        const baseId = getBaseId(card);
+        if (baseIds.has(baseId)) return true;
+        baseIds.add(baseId);
+      }
+    }
+
+    return false;
+  }
+
   function combinations(array, k) {
     const result = [];
     function backtrack(start, combo) {
@@ -477,7 +512,9 @@ export default function DeckExplorer() {
             }
           }
 
-          if (hasDuplicateUnique) continue; // スキップ
+          if (hasDuplicateUnique) continue;
+          if (hasDuplicateUniqueCardsAcrossLoadout(loadout, cards, slots)) continue;
+
             const newLoadout = structuredClone(loadout);
 
             if (!newLoadout.customizationGroups) newLoadout.customizationGroups = [];
