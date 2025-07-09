@@ -3,12 +3,22 @@
 All notable changes to the contest simulator will be documented in this file.
 Dates are based on Eastern Time Zone.
 
+## 2025-07-08
+
+### Fixed
+
+- Swapped effects of SR Misuzu p-item upgraded version
+
 ## 2025-07-07
 
 ### Added
 
 - New p-item
 - Customizations for FMW, LSM, Sekaiichi
+
+### Fixed
+
+- Season 27 Stage 2 effect order
 
 ## 2025-07-04
 
