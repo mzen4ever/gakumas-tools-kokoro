@@ -3,6 +3,17 @@
 All notable changes to the contest simulator will be documented in this file.
 Dates are based on Eastern Time Zone.
 
+## 2025-07-15
+
+### Added
+
+- Sunfaded Hiro preview
+
+### Fixed
+
+- Fixed 金魚すくいで勝負 type
+- Fixed バスに揺られて plan
+
 ## 2025-07-09
 
 ### Fixed
