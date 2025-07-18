@@ -39,6 +39,10 @@
     "rehearsal": {
       "title": "리허설 스코어 불러오기",
       "description": "리허설 스크린샷으로부터 스코어 불러오기"
+    },
+    "deckexplorer": {
+      "title": "アイテム探索",
+      "description": "高スコアが出るアイテム組み合わせを自動探索する"
     }
   },
   "NavbarMenu": {
