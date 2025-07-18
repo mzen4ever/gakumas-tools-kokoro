@@ -261,8 +261,8 @@ id,name,rarity,upgraded,plan,mode,sourceType,pIdolId,welfare,effects
 260,お残しにんじん,SR,FALSE,free,produce,support,,FALSE,
 261,休憩中のおやつ,R,FALSE,anomaly,stage,pIdol,91,FALSE,"at:afterCardUsed,if:cardEffects&preservation,if:isFullPower,do:score+=cumulativeFullPowerCharge*0.6,limit:3"
 262,休憩中のおやつ+,R,TRUE,anomaly,stage,pIdol,91,FALSE,"at:afterCardUsed,if:cardEffects&preservation,if:isFullPower,do:score+=cumulativeFullPowerCharge*0.6"
-263,そよ風に揺れる髪飾り,SR,FALSE,anomaly,stage,pIdol,92,FALSE,"at:afterActiveCardUsed,do:setStance(preservation),do:fixedStamina-=2,limit:3;at:afterActiveCardUsed,target:effect(strength),do:g.score+=3,limit:3"
-264,そよ風に揺れる髪飾り+,SR,TRUE,anomaly,stage,pIdol,92,FALSE,"at:afterActiveCardUsed,do:setStance(preservation),do:fixedStamina-=2,limit:2;at:afterActiveCardUsed,target:effect(strength),do:g.score+=3,limit:2"
+263,そよ風に揺れる髪飾り,SR,FALSE,anomaly,stage,pIdol,92,FALSE,"at:afterActiveCardUsed,do:setStance(preservation),do:fixedStamina-=2,limit:2;at:afterActiveCardUsed,target:effect(strength),do:g.score+=3,limit:2"
+264,そよ風に揺れる髪飾り+,SR,TRUE,anomaly,stage,pIdol,92,FALSE,"at:afterActiveCardUsed,do:setStance(preservation),do:fixedStamina-=2,limit:3;at:afterActiveCardUsed,target:effect(strength),do:g.score+=3,limit:3"
 265,いつもの持ち物,SSR,FALSE,anomaly,stage,pIdol,93,FALSE,"at:afterCardUsed,if:cardEffects&preservation,if:isFullPower,do:score+=cumulativeFullPowerCharge*1.4,do:fixedStamina-=1"
 266,いつもの持ち物+,SSR,TRUE,anomaly,stage,pIdol,93,FALSE,"at:afterCardUsed,if:cardEffects&preservation,if:isFullPower,do:score+=cumulativeFullPowerCharge*1.4"
 267,思い出カタメコイメ,SSR,FALSE,anomaly,produce,support,,FALSE,
@@ -304,3 +304,8 @@ id,name,rarity,upgraded,plan,mode,sourceType,pIdolId,welfare,effects
 303,初陣の証・美鈴+,R,TRUE,logic,stage,pIdol,100,FALSE,"at:startOfTurn,do:nullifyGenkiTurns+=2,limit:1;at:startOfTurn,delay:2,do:motivation+=10,limit:1"
 304,初陣の証・佑芽,R,FALSE,sense,stage,pIdol,101,FALSE,"at:startOfTurn,if:turnsRemaining<=2,do:score+=goodConditionTurns*0.3,do:fixedStamina-=1,limit:2"
 305,初陣の証・佑芽+,R,TRUE,sense,stage,pIdol,101,FALSE,"at:startOfTurn,if:turnsRemaining<=2,do:score+=goodConditionTurns*0.3,limit:2"
+306,好き嫌い禁止！,SSR,FALSE,free,stage,support,,TRUE,"at:startOfTurn,if:isDanceTurn,if:stamina<=maxStamina*0.5,do:fixedGenki+=10,limit:1"
+307,原点へのチケット,SSR,FALSE,anomaly,stage,pIdol,102,FALSE,"at:staminaDecreased,do:enthusiasmMultiplier+=0.6,limit:3"
+308,原点へのチケット+,SSR,TRUE,anomaly,stage,pIdol,102,FALSE,"at:staminaDecreased,do:enthusiasmMultiplier+=0.6,limit:3"
+309,面白くて心配な子,SSR,FALSE,anomaly,produce,support,,FALSE,
+310,ビシッビシッ竹刀,SR,FALSE,anomaly,produce,support,,FALSE,
