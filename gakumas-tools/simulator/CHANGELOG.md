@@ -5,9 +5,8 @@ Dates are based on Eastern Time Zone.
 
 ## 2025-07-18
 
-### Added
-
-- Sunfaded Hiro
+- Added Sunfaded Hiro
+- Add preview of contest season 28
 
 ## 2025-07-15
 
