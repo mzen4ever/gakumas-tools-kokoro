@@ -37,8 +37,6 @@ function Navbar() {
           <NavbarMenu />
         </div>
       </nav>
-      {OSHI_PROPS && <Oshi {...OSHI_PROPS} />}
-    </>
   );
 }
 
