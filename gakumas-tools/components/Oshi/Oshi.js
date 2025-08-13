@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Resizable } from "re-resizable";
+import YouTubeVideo from "@/components/YouTubeVideo";
 import styles from "./Oshi.module.scss";
 
 export default function Oshi({ text, initiallyExpanded, videoId, url }) {
@@ -9,14 +10,30 @@ export default function Oshi({ text, initiallyExpanded, videoId, url }) {
   if (url) {
     return (
       <div className={styles.oshi}>
-        <a
-          className={styles.expand}
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {text}
-        </a>
+        {expanded ? (
+          <a
+            className={styles.expand}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setExpanded(false)}
+          >
+            {text}
+          </a>
+        ) : (
+          <button className={styles.expand} onClick={() => setExpanded(true)}>
+            <div
+              style={{
+                display: "inline-block",
+                marginRight: 8,
+                backgroundColor: "#ff3333",
+                borderRadius: 5,
+                width: 10,
+                height: 10,
+              }}
+            />{" "}
+          </button>
+        )}
       </div>
     );
   } else if (videoId) {
@@ -30,14 +47,7 @@ export default function Oshi({ text, initiallyExpanded, videoId, url }) {
               handleClasses={{ bottom: styles.handle }}
               enable={{ bottom: true }}
             >
-              <iframe
-                src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-                title="YouTube video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              ></iframe>
+              <YouTubeVideo videoId={videoId} />
             </Resizable>
             <button className={styles.close} onClick={() => setExpanded(false)}>
               ×
