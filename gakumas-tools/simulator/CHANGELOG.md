@@ -12,6 +12,26 @@ Dates are based on Eastern Time Zone.
 
 
 
+
+
+
+
+## 2025-08-25
+
+- Fix lock stance turns being applied to full power ending
+
+## 2025-08-24
+
+- Change behavior of full power stance reset to trigger at beforeStartOfTurn
+
+## 2025-08-22
+
+- Update for level cap 70
+
+## 2025-08-21
+
+- Update S30 contest
+
 ## 2025-08-20
 
 - Add season 30 preview
