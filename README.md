@@ -9,3 +9,10 @@ This monorepo contains the Gakumas Tools web app and related packages. For infor
   - [gakumas-data](https://github.com/surisuririsu/gakumas-tools/blob/master/packages/gakumas-data/README.md)
   - [gakumas-engine](https://github.com/surisuririsu/gakumas-tools/blob/master/packages/gakumas-engine/README.md)
   - [gakumas-images](https://github.com/surisuririsu/gakumas-tools/blob/master/packages/gakumas-images/README.md)
+
+---
+
+## Notes
+
+This repository is a fork of the original [surisuririsu/gakumas-tools](https://github.com/surisuririsu/gakumas-tools).  
+**Gakumas Tools KOKORO follows the upstream project** and aims to stay aligned with its development.
