@@ -2,19 +2,6 @@ import { Idols } from "gakumas-data";
 import gkImg from "gakumas-images";
 import Image from "@/components/Image";
 
-const Badge = () => (
-  <div
-    style={{
-      display: "inline-block",
-      marginRight: 8,
-      backgroundColor: "#ff3333",
-      borderRadius: 5,
-      width: 10,
-      height: 10,
-    }}
-  />
-);
-
 const IdolIcon = ({ idolId }) => {
   const idol = Idols.getById(idolId);
   return (
@@ -29,7 +16,46 @@ const IdolIcon = ({ idolId }) => {
   );
 };
 
-export const OSHI_PROPS = null;
+export const OSHI_PROPS = {
+  text: (
+    <div>
+      <IdolIcon idolId={12} />
+      <IdolIcon idolId={10} />
+      <IdolIcon idolId={6} />
+      <IdolIcon idolId={8} />
+      「Let's GO!! ICHI-NO-NI!!」
+    </div>
+  ),
+  videoId: "RYMg75Xn6sw",
+};
+
+// export const OSHI_PROPS = {
+//   text: (
+//     <div>
+//       今夜19時に
+//       <IdolIcon idolId={9} />
+//       「薄井友里のツイてる！フロンティア」に
+//       <IdolIcon idolId={6} />
+//       伊藤舞音さんがゲスト出演します！
+//     </div>
+//   ),
+//   initiallyExpanded: true,
+//   url: "https://nicochannel.jp/usui/live/smJwrvRwxbnuTZLz3cbbzNYi",
+// };
+
+// export const OSHI_PROPS = {
+//   text: (
+//     <div>
+//       今夜20時に
+//       <IdolIcon idolId={6} />
+//       伊藤舞音・浅見香月の『おかづラジオ』5回目の配信があります！
+//       <IdolIcon idolId={5} />
+//       花岩香奈さんもゲストで登場します！ぜひ観てみてください！
+//     </div>
+//   ),
+//   initiallyExpanded: true,
+//   url: "https://nicochannel.jp/okazuradio/live/smXBG4dkhNHQJqMb774yQNyr",
+// };
 
 // export const OSHI_PROPS = {
 //   text: (

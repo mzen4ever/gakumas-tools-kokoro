@@ -90,12 +90,12 @@ export default function Simulator() {
 
   const setResult = useCallback(
     (result) => {
-      const bucketedScores = bucketScores(result.scores);
+      const { bucketedScores, bucketSize } = bucketScores(result.scores);
       const medianScore = getMedianScore(result.scores);
 
       console.timeEnd("simulation");
 
-      setSimulatorData({ bucketedScores, medianScore, ...result });
+      setSimulatorData({ bucketedScores, medianScore, bucketSize, ...result });
       setRunning(false);
     },
     [setSimulatorData, setRunning]
@@ -248,7 +248,7 @@ export default function Simulator() {
             href="https://github.com/surisuririsu/gakumas-tools/blob/master/gakumas-tools/simulator/CHANGELOG.md"
             target="_blank"
           >
-            {t("lastUpdated")}: 2025-08-28
+            {t("lastUpdated")}: 2025-08-29
           </a>
         </div>
         {!simulatorData && (
