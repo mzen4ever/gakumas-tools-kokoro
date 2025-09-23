@@ -4,6 +4,42 @@ All notable changes to the contest simulator will be documented in this file.
 Dates are based on Eastern Time Zone.
 
 
+
+
+
+
+
+
+
+## 2025-09-23
+
+- Adjust S32 turn rates
+
+## 2025-09-17
+
+- Update for 36degCUBU Rinami
+
+## 2025-09-16
+
+- Add preview of gekkan anime talk
+
+## 2025-09-10
+
+- Fix holding multiple cards
+- Add preview of 36CUBU Rinami
+
+## 2025-09-08
+
+- Update Na Now Hiro, add WS, Hakusen, TLOS custom
+
+## 2025-09-07
+
+- Preview of Na Now Hiro
+
+## 2025-09-06
+
+- Added event stages
+
 ## 2025-09-05
 
 - Season 31 preview

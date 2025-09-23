@@ -187,7 +187,7 @@
   },
   "MemoryImporterModal": {
     "importMemories": "Import memories from screenshots",
-    "instructions": "<p>Contest power, parameters, p-items, and skill card icons must be visible in each screenshot.</p><p>Importing may take several seconds or minutes depending on the number of memories imported and your device's processor and memory. Your browser may crash if you try to import too many memories at once. The recommended limit is 50 memories per batch. Use on a smartphone is not recommended.</p><p>Some memories may fail to parse correctly, and require fixing after import. In such cases, they will be marked with \"(FIXME)\" in the name.</p>",
+    "instructions": "<p>Parameters, p-items, and skill card icons must be visible in each screenshot.</p><p>Importing may take several seconds or minutes depending on the number of memories imported and your device's processor and memory. Your browser may crash if you try to import too many memories at once.</p><p>Some memories may fail to parse correctly, and require fixing after import. In such cases, they will be marked with \"(FIXME)\" in the name.</p>",
     "progress": "Progress: {progress}/{total}"
   },
   "Simulator": {
@@ -313,6 +313,7 @@
     "discardedCard": "スキルカードを捨札に移動",
     "movedCardToHand": "スキルカードを手札に移動",
     "movedCardToTopOfDeck": "スキルカードを山札の上に移動",
+    "movedCardToDeckAtRandom": "スキルカードを山札のランダムな位置に移動",
     "effect": "持続効果",
     "stageEffect": "ステージ効果",
     "skillCard": "スキルカード",

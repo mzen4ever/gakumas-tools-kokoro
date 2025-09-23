@@ -23,6 +23,9 @@ export default class CardManager extends EngineComponent {
         state[S.usedCard] && state[S.cardMap][state[S.usedCard]].baseId,
       numHeldCards: (state) => state[S.heldCards].length,
       numRemovedCards: (state) => state[S.removedCards].length,
+      countCards: (state, targetRule) =>
+        this.getTargetRuleCards(state, targetRule.replaceAll("\\", "*"), null)
+          .size,
     };
   }
 
@@ -531,6 +534,74 @@ export default class CardManager extends EngineComponent {
     }
   }
 
+  moveSSRToHand(state, num) {
+    let ssrCards = [];
+    for (let pile of [S.deckCards, S.discardedCards]) {
+      for (let i = 0; i < state[pile].length; i++) {
+        const cardIdx = state[pile][i];
+        const card = state[S.cardMap][cardIdx];
+        const skillCard = SkillCards.getById(card.id);
+        if (skillCard.rarity === "SSR") {
+          ssrCards.push({ pile, index: i, cardIdx });
+        }
+      }
+    }
+    if (!ssrCards.length) return;
+    for (let i = 0; i < num && ssrCards.length; i++) {
+      const pick = ssrCards.splice(
+        Math.floor(getRand() * ssrCards.length),
+        1
+      )[0];
+
+      // Sort remaining cards by index descending to avoid index shifting issues
+      const remainingFromSamePile = ssrCards.filter(
+        (card) => card.pile === pick.pile
+      );
+      remainingFromSamePile.sort((a, b) => b.index - a.index);
+
+      // Update indexes for cards after the removed one
+      for (let card of remainingFromSamePile) {
+        if (card.index > pick.index) {
+          card.index--;
+        }
+      }
+
+      state[pick.pile].splice(pick.index, 1);
+      state[S.handCards].push(pick.cardIdx);
+      this.logger.log(state, "moveCardToHand", {
+        type: "skillCard",
+        id: state[S.cardMap][pick.cardIdx].id,
+      });
+    }
+  }
+
+  moveActiveCardsToDeckFromRemoved(state) {
+    let cards = state[S.cardMap]
+      .map((c, i) =>
+        state[S.removedCards].includes(i) &&
+        SkillCards.getById(c.id).type == "active"
+          ? i
+          : -1
+      )
+      .filter((i) => i != -1);
+
+    if (!cards.length) return;
+
+    cards.forEach((card) => {
+      const index = state[S.removedCards].indexOf(card);
+      if (index != -1) {
+        state[S.removedCards].splice(index, 1);
+        const insertIndex = Math.floor(getRand() * state[S.deckCards].length);
+        state[S.deckCards].splice(insertIndex, 0, card);
+
+        this.logger.log(state, "moveCardToDeckAtRandom", {
+          type: "skillCard",
+          id: state[S.cardMap][card].id,
+        });
+      }
+    });
+  }
+
   hold(state, card) {
     // Hold the card
     if (card != null) {
@@ -564,7 +635,9 @@ export default class CardManager extends EngineComponent {
     if (!cards.length) return;
 
     // Pick card to hold based on strategy
-    let indicesToHold = this.engine.strategy.pickCardsToHold(state, cards, num);
+    let indicesToHold = this.engine.strategy
+      .pickCardsToHold(state, cards, num)
+      .sort((a, b) => b - a);
     if (indicesToHold.length === 0) return;
 
     // Find cards and move to hold
@@ -673,9 +746,17 @@ export default class CardManager extends EngineComponent {
       for (let k = 0; k < state[S.deckCards].length; k++) {
         targetCards.add(state[S.deckCards][k]);
       }
+    } else if (target == "discarded") {
+      for (let k = 0; k < state[S.discardedCards].length; k++) {
+        targetCards.add(state[S.discardedCards][k]);
+      }
     } else if (target == "held") {
       for (let k = 0; k < state[S.heldCards].length; k++) {
         targetCards.add(state[S.heldCards][k]);
+      }
+    } else if (target == "removed") {
+      for (let k = 0; k < state[S.removedCards].length; k++) {
+        targetCards.add(state[S.removedCards][k]);
       }
     } else if (target == "all") {
       for (let k = 0; k < state[S.cardMap].length; k++) {

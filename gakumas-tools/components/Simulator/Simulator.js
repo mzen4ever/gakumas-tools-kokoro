@@ -50,6 +50,7 @@ export default function Simulator() {
     setSupportBonus,
     setParams,
     replacePItemId,
+    swapPItemIds,
     pushLoadoutHistory,
   } = useContext(LoadoutContext);
   const { plan, idolId } = useContext(WorkspaceContext);
@@ -147,15 +148,6 @@ export default function Simulator() {
   return (
     <div id="simulator_loadout" className={styles.loadoutEditor}>
       <div className={styles.configurator}>
-        {/* <div className={styles.oshi}>
-          <a
-            href="https://asobistage.asobistore.jp/event/idolmaster_orch_2025/ticket"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            シミュなんか回してないでオケマス観ましょう！！
-          </a>
-        </div> */}
         <div>{t("multiplierNote")}</div>
         {stage.preview && <div>{t("previewNote")}</div>}
         <StageSelect />
@@ -194,6 +186,7 @@ export default function Simulator() {
             <StagePItems
               pItemIds={loadout.pItemIds}
               replacePItemId={replacePItemId}
+              swapPItemIds={swapPItemIds}
               indications={pItemIndications}
               size="medium"
             />
@@ -248,7 +241,7 @@ export default function Simulator() {
             href="https://github.com/surisuririsu/gakumas-tools/blob/master/gakumas-tools/simulator/CHANGELOG.md"
             target="_blank"
           >
-            {t("lastUpdated")}: 2025-09-05
+            {t("lastUpdated")}: 2025-09-23
           </a>
         </div>
         {!simulatorData && (
