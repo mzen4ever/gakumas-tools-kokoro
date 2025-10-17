@@ -3,13 +3,21 @@
 All notable changes to the contest simulator will be documented in this file.
 Dates are based on Eastern Time Zone.
 
+## 2025-10-10
 
+- Add Gamushara Temari
 
+## 2025-10-08
 
+- Add preview of contest season 33
 
+## 2025-09-29
 
+- Add gamushara Kotone and Saki
 
+## 2025-09-28
 
+- Add preview of gamushara kotone
 
 ## 2025-09-23
 
