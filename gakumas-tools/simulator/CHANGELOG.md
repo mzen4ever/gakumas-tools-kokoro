@@ -3,6 +3,25 @@
 All notable changes to the contest simulator will be documented in this file.
 Dates are based on Eastern Time Zone.
 
+
+
+
+## 2025-10-27
+
+- Updated first turn rates for S34"
+
+## 2025-10-25
+
+- Added preview of S34, changed start of turn and start of stage behavior
+
+## 2025-10-21
+
+- Update Sora to Yakusoku China
+
+## 2025-10-20
+
+- Add Sora to Yakusoku China preview
+
 ## 2025-10-10
 
 - Add Gamushara Temari
